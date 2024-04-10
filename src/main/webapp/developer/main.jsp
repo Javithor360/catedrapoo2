@@ -26,5 +26,6 @@
 <body>
 <h1>Bienvenido programador</h1>
 <h2>Tú eres <%= user.getName() %></h2>
+<a href="../session_handler?operacion=logout"><button>Salir</button></a>
 </body>
 </html>

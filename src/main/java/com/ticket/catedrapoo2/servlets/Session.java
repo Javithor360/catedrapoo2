@@ -12,6 +12,13 @@ import java.sql.SQLException;
 
 @WebServlet(name = "Session", urlPatterns = {"/session_handler"})
 public class Session extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Método que se encarga de manejar la lógica de la petición
+        processRequest(request, response);
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Método que se encarga de manejar la lógica de la petición
@@ -74,6 +81,10 @@ public class Session extends HttpServlet {
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
+        } else if (operacion.equals("logout")) {
+            currentSession.setAttribute("user", null);
+            currentSession.invalidate();
+            response.sendRedirect("login.jsp");
         }
     }
 }
