@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 
-@WebServlet(name = "JefeDesarrolloController", value = "/jdc")
+@WebServlet(name = "JefeDesarrolloController", urlPatterns = {"/jdc"})
 public class JefeDesarrolloController extends HttpServlet {
     JefeDesarrolloModel jdm = new JefeDesarrolloModel();
     @Override
@@ -41,6 +41,8 @@ public class JefeDesarrolloController extends HttpServlet {
                 case "display_new_tickets":
                     displayNewTickets(request, response, user.getId());
                     break;
+                case "display_new_ticket_info":
+                    break;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -53,9 +55,7 @@ public class JefeDesarrolloController extends HttpServlet {
             request.setAttribute("new_tickets", jdm.fetchNewTickets(dev_boss_id));
             // Redirigiendo a la vista correspondiente para mostrar los datos en pantalla
             request.getRequestDispatcher("/dev_boss/main.jsp").forward(request, response);
-        } catch (ServletException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (ServletException | IOException e) {
             throw new RuntimeException(e);
         }
     }

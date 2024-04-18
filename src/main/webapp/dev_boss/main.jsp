@@ -25,7 +25,7 @@
     String actionParam = request.getParameter("action");
     if (actionParam == null || !actionParam.equals("display_new_tickets")) {
         // Redirigir al servlet con el parámetro "action"
-        response.sendRedirect("/jdc?action=display_new_tickets");
+        request.getRequestDispatcher("/jdc?action=display_new_tickets").forward(request, response);
         return;
     }
 %>
@@ -37,14 +37,14 @@
     <title>Title</title>
 </head>
 <body>
-<nav class="navbar navbar-light bg-light navbar-expand-sm">
+<nav class="navbar navbar-dark bg-dark navbar-expand-sm">
     <div class="container-fluid">
         <div class="navbar-nav me-auto">
             <a class="nav-link active" aria-current="page" href="#">Inicio</a>
             <a class="nav-link" href="#">Supervisar</a>
         </div>
         <div class="navbar-nav ms-auto">
-            <a class="nav-link text-white bg-danger p-2 rounded" href="../session_handler?operacion=logout">Cerrar sesión</a>
+            <a class="nav-link btn btn-danger text-white" href="../session_handler?operacion=logout">Cerrar sesión</a>
         </div>
     </div>
 </nav>
@@ -62,6 +62,7 @@
                         <th>Código</th>
                         <th>Solicitante</th>
                         <th>Título</th>
+                        <th>Acción</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -80,6 +81,24 @@
                         <td><%= ticket.getId() %></td>
                         <td><%= ticket.getBoss_name() %></td>
                         <td><%= ticket.getName() %></td>
+                        <td>
+                            <button
+                                class="btn btn-primary justify-content-center"
+                                data-bs-toggle="modal"
+                                data-bs-target="#ticketModal"
+                                onclick="loadTicketInfo({
+                                    id: <%= ticket.getId() %>,
+                                    code: '<%= ticket.getCode() %>',
+                                    title: '<%= ticket.getName() %>',
+                                    description: '<%= ticket.getDescription() %>',
+                                    observations: null,
+                                    requester_name: '<%= ticket.getBoss_name() %>',
+                                    requester_area_name: '<%= ticket.getRequester_area_name() %>'
+                                })"
+                            >
+                                Ver más
+                            </button>
+                        </td>
                     </tr>
                 <%
                         }
@@ -90,5 +109,55 @@
         </div>
     </div>
 </main>
+
+<!-- Modal -->
+<div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ticketModalLabel">Detalles del Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+            </div>
+            <div class="modal-body" id="ticketModalBody">
+                <!-- Aquí se mostrará la información del ticket -->
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
+
+<script>
+
+    function loadTicketInfo(ticket) {
+        // Construir el HTML con la información del ticket
+        document.getElementById("ticketModalBody").innerHTML = "<h2 class='text-center'>Solicitud del caso " + ticket.code + "</h2><form>" +
+            "<div class='form-group'>" +
+            "<label for='code'><strong>ID:</strong></label>" +
+            "<input type='text' id='code' class='form-control' value='" + ticket.id + "' readonly>" +
+            "</div>" +
+            "<div class='form-group'>" +
+            "<label for='title'><strong>Título:</strong></label>" +
+            "<input type='text' id='title' class='form-control' value='" + ticket.title + "' readonly>" +
+            "</div>" +
+            "<div class='form-group'>" +
+            "<label for='description'><strong>Descripción:</strong></label>" +
+            "<textarea id='description' class='form-control' rows='3' readonly>" + ticket.description + "</textarea>" +
+            "</div>" +
+            "<div class='form-group'>" +
+            "<label for='requester_name'><strong>Solicitante:</strong></label>" +
+            "<input type='text' id='requester_name' class='form-control' value='" + ticket.requester_name + " (Depto de. " + ticket.requester_area_name + ")' readonly>" +
+            "</div>" +
+            "<div class='form-group'>" +
+            "<label for='observations'><strong>Observaciones:</strong></label>" +
+            "<textarea id='observations' class='form-control' rows='3' placeholder='Escribe aquí tus observaciones...'></textarea>" +
+            "</div>" +
+            "</form>" +
+            "<div class='d-flex justify-content-center gap-2'>" +
+            "<button type='button' class='btn btn-success mr-2'>Aceptar</button>" +
+            "<button type='button' class='btn btn-danger mr-2'>Rechazar</button>" +
+            "<button type='button' class='btn btn-info' data-bs-dismiss='modal' aria-label='Close'>Salir</button>" +
+            "</div>";
+    }
+</script>
 </html>
