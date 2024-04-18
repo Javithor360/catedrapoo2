@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 public class JefeDesarrolloModel {
 
-    public static void fetchNewTickets(int dev_boss_id) throws SQLException {
+    public HashMap<String, Ticket> fetchNewTickets(int dev_boss_id) throws SQLException {
         HashMap<String, Ticket> ticketList = new HashMap<>();
 
         Conexion conexion = new Conexion();
@@ -34,8 +34,10 @@ public class JefeDesarrolloModel {
             );
             ticketList.put(ticket.getCode(), ticket);
         }
-        JefeDesarrollo.setTickets_request(ticketList);
+        rs.close();
         conexion.closeConnection();
+
+        return ticketList;
     }
 
     public static void fetchAllTickets(int dev_boss_id) throws SQLException {
