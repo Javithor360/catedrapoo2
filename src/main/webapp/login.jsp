@@ -1,4 +1,4 @@
-<%@ page import="com.ticket.catedrapoo2.model.UserSession" %><%--
+<%@ page import="com.ticket.catedrapoo2.beans.UserSession" %><%--
   Created by IntelliJ IDEA.
   User: flore
   Date: 9/4/2024

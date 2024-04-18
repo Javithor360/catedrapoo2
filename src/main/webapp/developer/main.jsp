@@ -6,7 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<%@ page import="com.ticket.catedrapoo2.model.UserSession" %>
+<%@ page import="com.ticket.catedrapoo2.beans.UserSession" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%

@@ -1,4 +1,4 @@
-package com.ticket.catedrapoo2.model;
+package com.ticket.catedrapoo2.beans;
 
 import java.util.Date;
 

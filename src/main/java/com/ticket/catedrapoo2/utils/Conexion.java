@@ -1,4 +1,4 @@
-package com.ticket.catedrapoo2.util;
+package com.ticket.catedrapoo2.utils;
 
 import java.sql.*;
 

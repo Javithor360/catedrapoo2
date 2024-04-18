@@ -1,7 +1,7 @@
-package com.ticket.catedrapoo2.servlets;
+package com.ticket.catedrapoo2.controllers;
 
-import com.ticket.catedrapoo2.model.UserSession;
-import com.ticket.catedrapoo2.util.Conexion;
+import com.ticket.catedrapoo2.beans.UserSession;
+import com.ticket.catedrapoo2.utils.Conexion;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
