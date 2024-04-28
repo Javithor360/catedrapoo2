@@ -1,8 +1,4 @@
-package com.ticket.catedrapoo2.models;
-
-import com.ticket.catedrapoo2.beans.Bitacora;
-import com.ticket.catedrapoo2.beans.Ticket;
-import com.ticket.catedrapoo2.beans.Conexion;
+package com.ticket.catedrapoo2.beans;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -71,7 +67,7 @@ public class JefeDesarrolloBean {
     }
 
     // Obtener todos los tickets que no son recién solicitados
-    public void fetchAllTickets(int dev_boss_id) throws SQLException {
+    public HashMap<String, Ticket> fetchAllTickets(int dev_boss_id) throws SQLException {
         HashMap<String, Ticket> ticketList = new HashMap<>();
 
         Conexion conexion = null;
@@ -91,7 +87,7 @@ public class JefeDesarrolloBean {
                     "u3.name AS programmer_name, " +
                     "u4.name AS tester_name, " +
                     "a.name AS area_name, " +
-                    "o.description AS observations" +
+                    "o.description AS observations " +
                     "FROM tickets t " +
                     "LEFT JOIN users u ON t.boss_id = u.id " +
                     "LEFT JOIN users u2 ON t.dev_boss_id = u2.id " +
@@ -157,8 +153,8 @@ public class JefeDesarrolloBean {
                 ticket.setLogs(ticketLogs);
                 ticketList.put(ticket.getCode(), ticket);
             }
-            setAll_tickets(ticketList);
             conexion.closeConnection();
+            return ticketList;
         } finally {
             if(conexion != null) {
                 conexion.closeConnection();
@@ -167,7 +163,7 @@ public class JefeDesarrolloBean {
     }
 
     // Obteniendo la lista de programadores asignados al jefe de desarrollo
-    public void fetchProgramerListNames (int dev_boss_id, Ticket t) throws SQLException {
+    public HashMap<Integer, String> fetchProgramerListNames (int dev_boss_id, int ticket_id) throws SQLException {
         HashMap<Integer, String> programmers = new HashMap<>();
 
         Conexion conexion = new Conexion();
@@ -180,7 +176,7 @@ public class JefeDesarrolloBean {
                 "INNER JOIN users u ON ug.user_id = u.id " +
                 "WHERE t.dev_boss_id = " + dev_boss_id + " " +
                     "AND u.role_id = 2 " +
-                    "AND t.id = " + t.getId() + ";";
+                    "AND t.id = " + ticket_id + ";";
         conexion.setRs(query);
 
         ResultSet rs = conexion.getRs();
@@ -189,16 +185,26 @@ public class JefeDesarrolloBean {
             String programmer_name = rs.getString("programmer_name");
             programmers.put(programmer_id, programmer_name);
         }
-        setProgrammers_names(programmers);
         conexion.closeConnection();
+
+        return programmers;
     }
 
     // Obteniendo la lista de testers asignados al jefe de área solicitante
-    public void fetchTestersListNames (int dev_boss_id, Ticket t) throws SQLException {
+    public HashMap<Integer, String> fetchTestersListNames (int dev_boss_id, int ticket_id) throws SQLException {
         HashMap<Integer, String> testers = new HashMap<>();
 
         Conexion conexion = new Conexion();
-        String query = "SELECT u.name AS tester_name, u.id AS tester_id FROM tickets t INNER JOIN assignments_map a ON t.boss_id = a.boss_id INNER JOIN users_groups ug ON a.users_group_id = ug.group_id INNER JOIN users u ON ug.user_id = u.id WHERE t.dev_boss_id = " + dev_boss_id + " AND u.role_id = 4 AND t.id = " + t.getId() + ";";
+        String query = "SELECT " +
+                "u.name AS tester_name, " +
+                "u.id AS tester_id " +
+                "FROM tickets t " +
+                "INNER JOIN assignments_map a ON t.boss_id = a.boss_id " +
+                "INNER JOIN users_groups ug ON a.users_group_id = ug.group_id " +
+                "INNER JOIN users u ON ug.user_id = u.id " +
+                "WHERE t.dev_boss_id = " + dev_boss_id + " " +
+                    "AND u.role_id = 4 " +
+                    "AND t.id = " + ticket_id + ";";
         conexion.setRs(query);
 
         ResultSet rs = conexion.getRs();
@@ -207,16 +213,21 @@ public class JefeDesarrolloBean {
             String tester_name = rs.getString("tester_name");
             testers.put(tester_id, tester_name);
         }
-        setTesters_names(testers);
         conexion.closeConnection();
+
+        return testers;
     }
 
-    public void acceptTicket (Ticket t, String observations, int dev_boss_id) throws SQLException {
+    public void acceptTicket (int ticket_id, int programmer_id, int tester_id, int dev_boss_id, String observations, String due_date) throws SQLException {
         Conexion conexion = new Conexion();
         PreparedStatement stmt = null;
 
-        String queryUpdate = "UPDATE tickets SET programmer_id = " + t.getProgrammer_id() + ", tester_id = " + t.getTester_id() + ", due_date = \"" + t.getDue_date() + "\", state_id = 3 WHERE id = " + t.getId() + ";";
-        String queryInsert = "INSERT INTO observations (id, name, description, ticket_id, writer_id) VALUES (null, '', \"" + observations + "\", " + t.getId() + ", " + dev_boss_id + ");";
+        String queryUpdate = "UPDATE tickets " +
+                "SET programmer_id = " + programmer_id + ", tester_id = " + tester_id + ", due_date = \"" + due_date + "\", state_id = 3 " +
+                "WHERE id = " + ticket_id + ";";
+        String queryInsert = "INSERT INTO observations " +
+                "(id, name, description, ticket_id, writer_id) " +
+                "VALUES (null, '', \"" + observations + "\", " + ticket_id + ", " + dev_boss_id + ");";
 
         stmt = conexion.setQuery(queryUpdate);
         stmt.executeUpdate();
@@ -229,12 +240,16 @@ public class JefeDesarrolloBean {
         conexion.closeConnection();
     }
 
-    public void denyTicket (Ticket t, String observations, int dev_boss_id) throws SQLException {
+    public void denyTicket (int ticket_id, int dev_boss_id, String observations) throws SQLException {
         Conexion conexion = new Conexion();
         PreparedStatement stmt = null;
 
-        String queryUpdate = "UPDATE tickets SET state_id = 2 WHERE id = " + t.getId() + ";";
-        String queryInsert = "INSERT INTO observations (id, name, description, ticket_id, writer_id) VALUES (null, '', \"" + observations + "\", " + t.getId() + ", " + dev_boss_id + ");";
+        String queryUpdate = "UPDATE tickets " +
+                "SET state_id = 2 " +
+                "WHERE id = " + ticket_id + ";";
+        String queryInsert = "INSERT INTO observations " +
+                "(id, name, description, ticket_id, writer_id) " +
+                "VALUES (null, '', \"" + observations + "\", " + ticket_id + ", " + dev_boss_id + ");";
 
         stmt = conexion.setQuery(queryUpdate);
         stmt.executeUpdate();
