@@ -1,7 +1,5 @@
 package com.ticket.catedrapoo2.beans;
 
-import com.ticket.catedrapoo2.utils.Conexion;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;

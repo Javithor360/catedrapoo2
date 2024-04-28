@@ -2,7 +2,7 @@ package com.ticket.catedrapoo2.models;
 
 import com.ticket.catedrapoo2.beans.JefeArea;
 import com.ticket.catedrapoo2.beans.UserSession;
-import com.ticket.catedrapoo2.utils.Conexion;
+import com.ticket.catedrapoo2.beans.Conexion;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

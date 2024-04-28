@@ -1,7 +1,7 @@
 package com.ticket.catedrapoo2.controllers;
 
 import com.ticket.catedrapoo2.beans.UserSession;
-import com.ticket.catedrapoo2.models.JefeDesarrolloModel;
+import com.ticket.catedrapoo2.models.JefeDesarrolloBean;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -11,7 +11,9 @@ import java.sql.SQLException;
 
 @WebServlet(name = "JefeDesarrolloController", urlPatterns = {"/jdc"})
 public class JefeDesarrolloController extends HttpServlet {
-    JefeDesarrolloModel jdm = new JefeDesarrolloModel();
+    
+    JefeDesarrolloBean jdm = new JefeDesarrolloBean();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         processRequest(request, response);

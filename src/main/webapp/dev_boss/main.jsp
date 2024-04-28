@@ -56,7 +56,7 @@
     <div>
         <h3>Casos aperturados recientemente</h3>
         <div class="table-container">
-            <table class="table table-striped table-bordered table-hover">
+            <table class="table table-striped table-bordered text-center">
                 <thead>
                     <tr>
                         <th>Código</th>
