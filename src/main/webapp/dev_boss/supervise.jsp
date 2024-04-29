@@ -84,15 +84,18 @@
                                         .append("\"id\": \"").append(log.getValue().getId()).append("\",")
                                         .append("\"code_ticket\": \"").append(log.getValue().getCode()).append("\",")
                                         .append("\"name\": \"").append(log.getValue().getName()).append("\",")
-                                        .append("\"description\": \"").append(log.getValue().getDescription()).append("\",")
+                                        .append("\"description\": \"").append(log.getValue().getDescription().replace("\r\n", "\\n")).append("\",")
                                         .append("\"percent\": \"").append(log.getValue().getPercent()).append("\",")
                                         .append("\"programmer_name\": \"").append(log.getValue().getProgrammer_name()).append("\",")
                                         .append("\"created_at\": \"").append(log.getValue().getCreated_at()).append("\"")
                                         .append("},");
                             }
-                            logsArray.deleteCharAt(logsArray.length() - 1); // Eliminar la última coma
+                            if(logsArray.charAt(logsArray.length() - 1) == ',') {
+                                logsArray.deleteCharAt(logsArray.length() - 1); // Eliminar la última coma
+                            }
                             logsArray.append("]");
-                            System.out.println(logsArray);
+                            String description = ticket.getDescription().replace("\r\n", "\\n");
+                            String observations = ticket.getObservations().replace("\r\n", "\\n");
                 %>
                     <tr>
                         <td><%= ticket.getCode() %></td>
@@ -104,22 +107,22 @@
                                 class="btn btn-primary justify-content-center"
                                 data-bs-toggle="modal"
                                 data-bs-target="#ticketModal"
-                                onclick="loadTicketInfo({
+                                onclick='loadTicketInfo({
                                     id: <%= ticket.getId() %>,
-                                    code: '<%= ticket.getCode() %>',
-                                    state: '<%= ticket.getState() %>',
-                                    title: '<%= ticket.getName() %>',
-                                    description: '<%= ticket.getDescription() %>',
-                                    logs: '<%= ticket.getLogs() %>', // WIP
-                                    observations: '<%= ticket.getObservations() %>',
-                                    requester_name: '<%= ticket.getBoss_name() %>',
-                                    requester_area_name: '<%= ticket.getRequester_area_name() %>',
-                                    dev_boss_name: '<%= ticket.getDev_boss_name() %>',
-                                    programmer_name: '<%= ticket.getProgrammer_name() %>',
-                                    tester_name: '<%= ticket.getTester_name() %>',
-                                    created_at: '<%= ticket.getCreated_at() %>',
-                                    due_date: '<%= ticket.getDue_date() %>',
-                                })"
+                                    code: "<%= ticket.getCode() %>",
+                                    state: "<%= ticket.getState() %>",
+                                    title: "<%= ticket.getName() %>",
+                                    description: "<%= description %>",
+                                    logs: <%= logsArray.toString() %>,
+                                    observations: "<%= observations %>",
+                                    requester_name: "<%= ticket.getBoss_name() %>",
+                                    requester_area_name: "<%= ticket.getRequester_area_name() %>",
+                                    dev_boss_name: "<%= ticket.getDev_boss_name() %>",
+                                    programmer_name: "<%= ticket.getProgrammer_name() %>",
+                                    tester_name: "<%= ticket.getTester_name() %>",
+                                    created_at: "<%= ticket.getCreated_at() %>",
+                                    due_date: "<%= ticket.getDue_date() %>",
+                                })'
                             >
                                 Ver detalles
                             </button>
@@ -152,6 +155,22 @@
 
 <script>
     function loadTicketInfo(ticket) {
+        console.log(ticket.logs)
+        let logs;
+
+        if(ticket.logs.length === 0) {
+            logs = "<tr><td colspan='5'>No hay bitácoras registradas</td></tr>";
+        } else {
+            logs = ticket.logs.map(log => {
+                return "<tr>" +
+                    "<td>" + log.name + "</td>" +
+                    "<td>" + log.description + "</td>" +
+                    "<td>" + log.percent + "%</td>" +
+                    "<td>" + log.programmer_name + "</td>" +
+                    "<td>" + log.created_at + "</td>" +
+                    "</tr>";
+            }).join("");
+        }
         // Construir el HTML con la información del ticket
         document.getElementById("ticketModalBody").innerHTML = "<form>" +
             "<div class='row g-2'>" +
@@ -207,6 +226,23 @@
             "<label for='due_date'><strong>Fecha de entrega:</strong></label>" +
             "<input type='text' id='due_date' class='form-control' value='" + ticket.due_date + "' readonly>" +
             "</div>" +
+            "</div>" +
+            "<div class='form-group'>" +
+            "<label for='logs'><strong>Bitácora:</strong></label>" +
+            "<table class='table table-striped table-bordered text-center' id='logs'>" +
+            "<thead>" +
+            "<tr>" +
+            "<th>Título</th>" +
+            "<th>Descripción</th>" +
+            "<th>Avance</th>" +
+            "<th>Autor</th>" +
+            "<th>Fecha creación</th>" +
+            "</tr>" +
+            "</thead>" +
+            "<tbody>" +
+            logs +
+            "</tbody>" +
+            "</table>" +
             "</div>" +
             "</form>" +
             "<div class='d-flex justify-content-center gap-2'>" +
