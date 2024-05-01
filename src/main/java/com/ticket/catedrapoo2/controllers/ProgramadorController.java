@@ -60,8 +60,8 @@ public class ProgramadorController extends HttpServlet {
 
     private void displayTickets(final HttpServletRequest request, final HttpServletResponse response, final int programmer_id) throws ServletException, IOException {
         try {
-            request.setAttribute("tickets", pdm.fetchTickets(programmer_id));
-            request.getRequestDispatcher("/developer/main.jsp").forward(request, response);
+            request.setAttribute("tickets", pdm.fetchTickets(programmer_id)); // Se obtienen los tickets del programador y se guardan en un atributo de la petición
+            request.getRequestDispatcher("/developer/main.jsp").forward(request, response); // Se redirige a la vista principal del programador
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -69,8 +69,8 @@ public class ProgramadorController extends HttpServlet {
 
     private void displayTicketById(final HttpServletRequest request, final HttpServletResponse response, final int ticket_id) throws ServletException, IOException {
         try {
-            request.setAttribute("ticket", pdm.fetchTicketById(ticket_id));
-            request.getRequestDispatcher("/developer/detail.jsp?id=" + ticket_id).forward(request, response);
+            request.setAttribute("ticket", pdm.fetchTicketById(ticket_id)); // Se obtiene el ticket por su id y se guarda en un atributo de la petición
+            request.getRequestDispatcher("/developer/detail.jsp?id=" + ticket_id).forward(request, response); // Se redirige a la vista de detalle del ticket
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -78,25 +78,26 @@ public class ProgramadorController extends HttpServlet {
 
     private void addNewLog(final HttpServletRequest request, final HttpServletResponse response, final int ticket_id) throws IOException {
         try {
+            // Se obtienen los datos del formulario
             String ticket_code = request.getParameter("code");
             String log_title = request.getParameter("name");
             String log_desc = request.getParameter("description");
             Float percent = Float.parseFloat(request.getParameter("percent"));
             int programmer_id = Integer.parseInt(request.getParameter("programmer_id"));
 
-            pdm.newLog(ticket_code, log_title, log_desc, percent, programmer_id);
-            response.sendRedirect("/developer/detail.jsp?id=" + ticket_id + "&info=success_new_log");
+            pdm.newLog(ticket_code, log_title, log_desc, percent, programmer_id); // Se crea un nuevo log desde el Bean
+            response.sendRedirect("/developer/detail.jsp?id=" + ticket_id + "&info=success_new_log"); // Se redirige a la vista de detalle del ticket con un mensaje de éxito
         } catch (SQLException e) {
-            response.sendRedirect("/developer/detail.jsp?id=" + ticket_id + "&info=error_new_log");
+            response.sendRedirect("/developer/detail.jsp?id=" + ticket_id + "&info=error_new_log"); // Se redirige a la vista de detalle del ticket con un mensaje de error
         }
     }
 
     private void submitTicket(final HttpServletRequest request, final HttpServletResponse response, final int programmer_id, final int ticket_id) throws IOException {
         try {
-            pdm.submitTicket(ticket_id, programmer_id);
-            response.sendRedirect("/developer/detail.jsp?id=" + ticket_id + "&info=success_submit_ticket");
+            pdm.submitTicket(ticket_id, programmer_id); // Se envía el ticket al Bean para que lo marque como enviado
+            response.sendRedirect("/developer/detail.jsp?id=" + ticket_id + "&info=success_submit_ticket"); // Se redirige a la vista de detalle del ticket con un mensaje de éxito
         } catch (SQLException e) {
-            response.sendRedirect("/developer/detail.jsp?id=" + request.getParameter("id") + "&info=error_submit_ticket");
+            response.sendRedirect("/developer/detail.jsp?id=" + request.getParameter("id") + "&info=error_submit_ticket"); // Se redirige a la vista de detalle del ticket con un mensaje de error
         }
     }
 }

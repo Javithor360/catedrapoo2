@@ -12,9 +12,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
+    // Verificar si el usuario tiene una sesión activa
     HttpSession currentSession = request.getSession(false);
     UserSession user = (UserSession) currentSession.getAttribute("user");
 
+    // Si no hay sesión activa o el usuario no es un programador, redirigir al login
     if(user == null || user.getRole_id() != 2) {
         response.sendRedirect("../login.jsp");
         return;
@@ -37,6 +39,7 @@
 </head>
 <body>
 
+<!-- Importación del navbar -->
 <jsp:include page="../navbar.jsp" />
 
 <main class="container mt-3">
@@ -58,6 +61,7 @@
                 </thead>
                 <tbody>
                 <%
+                    // Obtener los tickets asignados al programador de la respuesta a la petición inicial
                     HashMap<String, Ticket> tickets = (HashMap<String, Ticket>) request.getAttribute("tickets");
                     if(tickets == null || tickets.isEmpty()) {
                 %>
@@ -66,6 +70,7 @@
                     </tr>
                 <%
                     } else {
+                        // Iterar sobre los tickets y mostrarlos en la tabla
                         for (Ticket ticket : tickets.values()) {
                 %>
                     <tr>
@@ -73,6 +78,7 @@
                         <td><%= ticket.getName() %></td>
                         <td><%= ticket.getDue_date() %></td>
                         <td>
+                            <!-- Botón para ver el detalle del ticket -->
                             <a href="/developer/detail.jsp?&id=<%= ticket.getId() %>" class="btn btn-primary">Ver</a>
                         </td>
                     </tr>

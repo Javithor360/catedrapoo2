@@ -17,6 +17,7 @@
     HttpSession currentSession = request.getSession(false);
     UserSession user = (UserSession) currentSession.getAttribute("user");
 
+    // Verificar si el usuario es un jefe de desarrollo
     if (user == null || user.getRole_id() != 1) {
         response.sendRedirect("../login.jsp");
         return;
@@ -39,6 +40,7 @@
 </head>
 <body>
 
+<!-- Incluir componente de navbar -->
 <jsp:include page="../navbar.jsp"/>
 
 <main class="container mt-3">
@@ -62,6 +64,7 @@
                 </thead>
                 <tbody>
                 <%
+                    // Obtener los tickets de la solicitud enviados por la petición
                     HashMap<String, Ticket> all_tickets = (HashMap<String, Ticket>) request.getAttribute("all_tickets");
                     if (all_tickets == null || all_tickets.isEmpty()) {
                 %>
@@ -70,11 +73,20 @@
                 </tr>
                 <%
                 } else {
+                    // Iterar sobre los tickets y mostrarlos en la tabla
                     for (Ticket ticket : all_tickets.values()) {
-                        // Convertir el HashMap a un array de objetos en JavaScript
+                        /*
+                            Método para convertir las iteraciones del HashMap con
+                            las Bitácoras a un array de objetos en JavaScript
+                         */
+
+                        // Inicializar el StringBuilder para el array de bitácoras
                         StringBuilder logsArray = new StringBuilder("[");
+                        // Empezando la iteración de las bitácoras
                         for (Map.Entry<Integer, Bitacora> log : ticket.getLogs().entrySet()) {
+                            // Por cada iteración se añade un objeto al array empezando con "{"
                             logsArray.append("{")
+                                    // Por cada iteración se añade una propiedad del objeto, importante escapar las comillas dobles para respetar el formato JSON
                                     .append("\"id\": \"").append(log.getValue().getId()).append("\",")
                                     .append("\"code_ticket\": \"").append(log.getValue().getCode()).append("\",")
                                     .append("\"name\": \"").append(log.getValue().getName()).append("\",")
@@ -84,14 +96,19 @@
                                     .append("\"created_at\": \"").append(log.getValue().getCreated_at()).append("\"")
                                     .append("},");
                         }
+                        // Verificar si el array de bitácoras no está vacío
                         if (logsArray.charAt(logsArray.length() - 1) == ',') {
-                            logsArray.deleteCharAt(logsArray.length() - 1); // Eliminar la última coma
+                            logsArray.deleteCharAt(logsArray.length() - 1); // En caso de que no, eliminar la última coma
                         }
+                        // Cerrar el array de bitácoras
                         logsArray.append("]");
+
+                        // Reemplazar los saltos de línea por "\n" para evitar errores en el HTML
                         String description = ticket.getDescription().replace("\r\n", "\\n");
                         String observations = ticket.getObservations().replace("\r\n", "\\n");
                 %>
                 <tr>
+                    <!-- Imprimiendo los demás datos de la iteración -->
                     <td><%= ticket.getCode() %>
                     </td>
                     <td><%= ticket.getBoss_name() %>
@@ -101,6 +118,13 @@
                     <td><%= ticket.getCreated_at() %>
                     </td>
                     <td>
+                        <!--
+                            1. Al hacer clic en el botón, se ejecutará la función "loadTicketInfo" con los datos del ticket
+                            2. Se abrirá el modal con la información del ticket
+                            ------
+                            Cabe mencionar que los datos del ticket se pasan como un objeto de JavaScript, además de que
+                            propiedades como description, observations y logsArray se pasan como strings para evitar errores
+                        -->
                         <button
                                 class="btn btn-primary justify-content-center"
                                 data-bs-toggle="modal"
@@ -152,13 +176,14 @@
 </div>
 
 <script>
+    // Función para cargar la información del ticket en el modal
     function loadTicketInfo(ticket) {
-        console.log(ticket.logs)
-        let logs;
+        let logs; // Variable para almacenar las bitácoras del ticket
 
         if (ticket.logs.length === 0) {
-            logs = "<tr><td colspan='5'>No hay bitácoras registradas</td></tr>";
+            logs = "<tr><td colspan='5'>No hay bitácoras registradas</td></tr>"; // En caso de que no haya bitácoras
         } else {
+            // Iterar sobre las bitácoras y construir el HTML
             logs = ticket.logs.map(log => {
                 return "<tr>" +
                     "<td>" + log.name + "</td>" +
@@ -170,11 +195,11 @@
             }).join("");
         }
         // Construir el HTML con la información del ticket
-        document.getElementById("ticketModalBody").innerHTML = "<form>" +
+        document.getElementById("ticketModalBody").innerHTML = "<form>" + // Formulario para mostrar los datos
             "<div class='row g-2'>" +
             "<div class='form-group col-md-4'>" +
             "<label for='id'><strong>ID:</strong></label>" +
-            "<input type='text' id='id' class='form-control' value='" + ticket.id + "' readonly>" +
+            "<input type='text' id='id' class='form-control' value='" + ticket.id + "' readonly>" + // Campos de solo lectura
             "</div>" +
             "<div class='form-group col-md-4'>" +
             "<label for='code'><strong>Código:</strong></label>" +
@@ -227,7 +252,7 @@
             "</div>" +
             "<div class='form-group'>" +
             "<label for='logs'><strong>Bitácora:</strong></label>" +
-            "<table class='table table-striped table-bordered text-center' id='logs'>" +
+            "<table class='table table-striped table-bordered text-center' id='logs'>" + // Tabla para mostrar las bitácoras
             "<thead>" +
             "<tr>" +
             "<th>Título</th>" +
@@ -238,7 +263,7 @@
             "</tr>" +
             "</thead>" +
             "<tbody>" +
-            logs +
+            logs + // Insertar las bitácoras obtenidas de la iteración principal
             "</tbody>" +
             "</table>" +
             "</div>" +

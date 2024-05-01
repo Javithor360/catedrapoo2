@@ -85,6 +85,7 @@ public class JefeDesarrolloController extends HttpServlet {
 
     private void acceptTicket(final HttpServletRequest request, final HttpServletResponse response, int dev_boss_id) throws IOException {
         try {
+            // Validando la fecha de vencimiento
             String dueDateString = request.getParameter("due_date");
             Date dueDate = new SimpleDateFormat("yyyy-MM-dd").parse(dueDateString);
             if (dueDateString == null || dueDate.compareTo(new Date()) <= 0) {
@@ -92,6 +93,7 @@ public class JefeDesarrolloController extends HttpServlet {
                 return;
             }
 
+            // Aceptando el ticket
             jdm.acceptTicket(
                     Integer.parseInt(request.getParameter("id")),
                     Integer.parseInt(request.getParameter("programmer")),
@@ -101,23 +103,25 @@ public class JefeDesarrolloController extends HttpServlet {
                     request.getParameter("due_date")
             );
 
-            response.sendRedirect("/dev_boss/main.jsp?info=success_accept_ticket");
+            response.sendRedirect("/dev_boss/main.jsp?info=success_accept_ticket"); // Redirigiendo a la vista principal del jefe de desarrollo
         } catch(SQLException | IOException | ParseException e) {
-            response.sendRedirect("/dev_boss/main.jsp?info=error_accept_ticket");
+            response.sendRedirect("/dev_boss/main.jsp?info=error_accept_ticket"); // Redirigiendo a la vista principal del jefe de desarrollo
         }
     }
 
     private void denyTicket(final HttpServletRequest request, final HttpServletResponse response, int dev_boss_id) throws SQLException, IOException {
         try {
+            // Denegando el ticket
             jdm.denyTicket(
                     Integer.parseInt(request.getParameter("id")),
                     dev_boss_id,
                     request.getParameter("observations")
             );
 
+            // Redirigiendo a la vista principal del jefe de desarrollo
             response.sendRedirect("/dev_boss/main.jsp?info=success_deny_ticket");
         } catch(Exception e) {
-            response.sendRedirect("/dev_boss/main.jsp?info=error_deny_ticket");
+            response.sendRedirect("/dev_boss/main.jsp?info=error_deny_ticket"); // Redirigiendo a la vista principal del jefe de desarrollo
         }
     }
 }

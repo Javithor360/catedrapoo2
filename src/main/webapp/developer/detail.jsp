@@ -15,22 +15,26 @@
     UserSession user = (UserSession) currentSession.getAttribute("user");
     Ticket ticket = (Ticket) request.getAttribute("ticket");
 
+    // Si no hay sesión o el usuario no es un programador, redirigir al login
     if (user == null || user.getRole_id() != 2) {
         response.sendRedirect("../login.jsp");
         return;
     }
 
+    // Si no hay ticket o el ticket no pertenece al programador, redirigir al dashboard
     if (request.getParameter("id") == null || (ticket != null && !ticket.getProgrammer_name().equals(user.getName()))) {
         response.sendRedirect("/developer/main.jsp");
         return;
     }
 
+    // Si no hay ticket, redirigir al dashboard
     String actionParam = request.getParameter("action");
     if (actionParam == null || !actionParam.equals("display_ticket")) {
         request.getRequestDispatcher("/pdc?action=display_ticket&ticket_id=" + request.getParameter("id")).forward(request, response);
         return;
     }
 
+    // Mensajes de información recibidos de la petición
     if (request.getParameter("info") != null) {
         if (request.getParameter("info").equals("success_new_log")) {
             request.setAttribute("info", "El registro de bitácora ha sido guardado con éxito");
@@ -43,6 +47,7 @@
         }
     }
 
+    // Obtener el progreso del ticket una vez el ticket esté definido
     double ticket_progress = ticket.get_latest_percent(ticket);
 %>
 <html>
@@ -53,10 +58,12 @@
 </head>
 <body>
 
+<!-- Navbar -->
 <jsp:include page="../navbar.jsp"/>
 
 <main class="container mx-auto my-5 w-50">
     <%
+        // Mostrar mensajes de información recibidos de la petición
         if (request.getAttribute("info") != null) {
     %>
     <div class="alert my-5 <%= request.getParameter("info").startsWith("error") ? "alert-danger" : "alert-success" %>"
@@ -68,11 +75,11 @@
     %>
     <h1 class="text-center">Información del ticket</h1>
     <hr class="mb-3"/>
-    <form action="#">
+    <form action="#"> <!-- Formulario de información del ticket -->
         <div class="row g-2">
             <div class='form-group col-md-4'>
                 <label for='id'><strong>ID:</strong></label>
-                <input type='text' id='id' class='form-control' value='<%= ticket.getId() %>' readonly>
+                <input type='text' id='id' class='form-control' value='<%= ticket.getId() %>' readonly> <!-- Campos solo de lectura -->
             </div>
             <div class='form-group col-md-4'>
                 <label for='code'><strong>Código:</strong></label>
@@ -135,7 +142,7 @@
 
         <div class='form-group'>
             <label for='logs'><strong>Bitácora:</strong></label>
-            <table class='table table-striped table-bordered text-center' id='logs'>
+            <table class='table table-striped table-bordered text-center' id='logs'> <!-- Tabla de bitácora -->
                 <thead>
                 <tr>
                     <th>Título</th>
@@ -147,6 +154,7 @@
                 </thead>
                 <tbody>
                 <%
+                    // Si no hay registros en la bitácora, mostrar mensaje
                     if (ticket.getLogs().isEmpty()) {
                 %>
                 <tr>
@@ -154,6 +162,7 @@
                 </tr>
                 <%
                 } else {
+                    // Mostrar registros de la bitácora
                     for (Map.Entry<Integer, Bitacora> logs : ticket.getLogs().entrySet()) {
                         Bitacora log = logs.getValue();
                 %>
@@ -176,7 +185,8 @@
                 </tbody>
             </table>
             <div class="d-flex justify-content-between">
-                <a href="/developer/main.jsp" class="btn btn-secondary">Volver</a>
+                <!-- Botones de acción -->
+                <a href="/developer/main.jsp" class="btn btn-secondary">Volver</a> <!-- Botón de volver -->
                 <div class="text-center">
                     <input type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLogModal"
                            value="Agregar nuevo registro" <%= ticket_progress < 100 ? "" : "disabled hidden" %>
@@ -186,9 +196,10 @@
                                    ticket_code: '<%= ticket.getCode() %>',
                                    programmer_name: '<%= user.getName() %>'
                                    })"
-                    />
+                    /> <!-- Botón de agregar nuevo registro -->
                 </div>
                 <%
+                    // Deshabilitar botón de entregar caso si el ticket ya está entregado o no está listo para ser entregado
                     boolean disableButton = (ticket_progress == 100 && ticket.getState_id() != 3 && ticket.getState_id() != 6) ||
                             (ticket_progress != 100 && (ticket.getState_id() == 3 || ticket.getState_id() == 6));
                 %>
@@ -200,7 +211,7 @@
                                ticket_id: <%= ticket.getId() %>,
                                ticket_code: '<%= ticket.getCode() %>'
                                })"
-                />
+                /> <!-- Botón de entregar caso -->
             </div>
         </div>
     </form>
@@ -237,9 +248,10 @@
 </div>
 
 <script>
-    function loadLogForm(ticket_info) {
+    // Funciones para cargar contenido en los modales
+    function loadLogForm(ticket_info) { // Cargar formulario de nuevo registro de bitácora que recibe información del ticket en un Object
         document.getElementById("addLogModalBody").innerHTML = "<p>Completa todos los campos para guardar el registro</p>" +
-            "<form onsubmit='return validateForm()' action='/pdc' method='post'>" +
+            "<form onsubmit='return validateForm()' action='/pdc' method='post'>" + // Formulario de nuevo registro de bitácora donde el evento onsubmit valida los campos y si to.do está correcto, envía la petición al servlet
             "<div class='row g-2'>" +
             "<div class='form-group col-md-6'>" +
             "<label for='ticket_code'><strong>Ticket:</strong></label>" +
@@ -264,7 +276,7 @@
             "<input type='number' min='0.00' max='100.00' step='0.01' class='form-control' id='percent' name='percent' placeholder='0' required />" +
             "</div>" +
             "<div class='d-flex justify-content-center'>" +
-            "<input type='hidden' name='ticket_id' value='" + ticket_info.ticket_id + "' />" +
+            "<input type='hidden' name='ticket_id' value='" + ticket_info.ticket_id + "' />" + // Campos ocultos con información del ticket
             "<input type='hidden' name='code' value='" + ticket_info.ticket_code + "' />" +
             "<input type='hidden' name='programmer_id' value='" + ticket_info.programmer_id + "' />" +
             "<input type='hidden' name='action' value='add_log' />" +
@@ -275,10 +287,12 @@
     }
 
     function validateForm() {
+        // Validar campos del formulario de nuevo registro de bitácora
         let title = document.getElementById("name").value;
         let description = document.getElementById("bdescription").value;
         let percent = document.getElementById("percent").value;
 
+        // Mostrar mensaje de error si los campos no están completos o no cumplen con las condiciones
         if (title === "" || description === "" || percent === "") {
             showErrorModal("Por favor, completa todos los campos.");
             return false;
@@ -289,23 +303,29 @@
             showErrorModal("El título debe tener al menos 10 caracteres y la descripción 50.");
             return false;
         }
+
+        // Si to.do está correcto, retornar true
         return true;
     }
 
     function showErrorModal(mensaje) {
+        // Mostrar modal de error con el mensaje recibido
         let errorModalBody = document.getElementById('extraModalBody');
         errorModalBody.innerHTML = "<p>" + mensaje + "</p>";
 
+        // Ocultar modal actual y mostrar modal de error
         let currentModal = bootstrap.Modal.getInstance(document.getElementById('addLogModal'));
         currentModal.hide();
 
+        // Mostrar modal de error
         let errorModal = new bootstrap.Modal(document.getElementById('extraModal'));
         errorModal.show();
     }
 
     function loadSubmitTicket(ticket_info) {
+        // Cargar modal de confirmación de entrega de caso
         document.getElementById("extraModalBody").innerHTML = "<p>¿Estás seguro que deseas entregar el caso <strong>" + ticket_info.ticket_code + "</strong>? Ten en cuenta que ya no podrás realizar modificaciones...</p>" +
-            "<a href='/pdc?action=submit_ticket&id=" + ticket_info.ticket_id + "' class='btn btn-success mr-3'>Entregar</a>" +
+            "<a href='/pdc?action=submit_ticket&id=" + ticket_info.ticket_id + "' class='btn btn-success mr-3'>Entregar</a>" + // Botón de entregar caso que redirige al servlet con la acción de entregar el caso
             "<button type='button' class='btn btn-secondary mr-3' data-bs-dismiss='modal' aria-label='Close'>Cancelar</button>";
     }
 </script>

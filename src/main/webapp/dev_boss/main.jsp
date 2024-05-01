@@ -12,13 +12,14 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Objects" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<jsp:useBean id="listNames" class="com.ticket.catedrapoo2.beans.JefeDesarrolloBean" scope="session" />
+<jsp:useBean id="listNames" class="com.ticket.catedrapoo2.beans.JefeDesarrolloBean" scope="session" /> <!-- Importar el Bean para obtener la lista de nombres -->
 
 <%
     // Obtener la sesión actual
     HttpSession currentSession = request.getSession(false);
     UserSession user = (UserSession) currentSession.getAttribute("user");
 
+    // Verificar si el usuario es nulo o si no es un jefe de desarrollo
     if(user == null || user.getRole_id() != 1) {
         response.sendRedirect("../login.jsp");
         return;
@@ -76,6 +77,7 @@
                 </thead>
                 <tbody>
                 <%
+                    // Obteniendo por medio del parámetro retornado por el servlet los tickets
                     HashMap<String, Ticket> new_tickets = (HashMap<String, Ticket>) request.getAttribute("new_tickets");
                     if(new_tickets == null || new_tickets.isEmpty()) {
                 %>
@@ -84,6 +86,7 @@
                     </tr>
                 <%
                     } else {
+                        // Iterando el HashMap para mostrar los tickets
                         for(Ticket ticket : new_tickets.values()) {
                 %>
                     <tr>
@@ -92,6 +95,12 @@
                         <td><%= ticket.getName() %></td>
                         <td><%= ticket.getCreated_at() %></td>
                         <td>
+                            <!--
+                                1. Un botón que permite interactuar con el ticket
+                                2. Al darle click se abre un modal con la información del ticket
+                                3. El evento "onclick" envía un Object de Javascript con los datos del ticket iterado
+                                4. Revisar la etiqueta script para darle seguimiento
+                            -->
                             <button
                                 class="btn btn-primary justify-content-center"
                                 data-bs-toggle="modal"
@@ -118,6 +127,7 @@
             </table>
         </div>
         <%
+            // Aquí se muestra el mensaje recibido por la URL en caso de que exista uno
             if(request.getParameter("info") != null) {
         %>
         <div class="alert mt-5 <%= request.getParameter("info").startsWith("error") ? "alert-danger" : "alert-success" %>"
@@ -161,6 +171,9 @@
 </body>
 
 <script>
+    // Función para cargar la información del ticket en el modal recibiendo el Object conteniendo la información de ticket
+
+    // Sí, al ser Javascript se tiene que construir el contenido del modal con strings...
     function loadTicketInfo(ticket) {
         // Construir el HTML con la información del ticket
         document.getElementById("ticketModalBody").innerHTML = "<h2 class='text-center'>Solicitud del caso " + ticket.code + "</h2><form>" +
@@ -190,26 +203,35 @@
             "<button type='button' class='btn btn-danger mr-2' data-bs-toggle='modal' data-bs-target='#acceptTicketModal' onclick='validateObservations(" + JSON.stringify(ticket) + ", 50, \"deny\")'>Rechazar</button>" +
             "<button type='button' class='btn btn-info' data-bs-dismiss='modal' aria-label='Close'>Salir</button>" +
             "</div>";
+
+        // Para los botones:
+        /*
+            1. Para la opción "Aceptar" y "Rechazar" se abre un modal vacío y a su vez se llama la función encargada de validar los inputs del formulario
+            2. La función "validateObservations" recibe el Object del ticket, la longitud mínima de las observaciones y el tipo de acción a procesar
+            3. Si las observaciones cumplen con la longitud mínima, se carga el modal con la información del ticket y las observaciones
+            4. Si las observaciones no cumplen con la longitud mínima, se muestra un mensaje de error
+         */
     }
 
     function loadConfirmTicket(ticket, type, observations) {
-        let message;
-        if (type === "invalid") {
+        let message; // Definir una variable para el mensaje a mostrar en el modal
+        if (type === "invalid") { // Verificar si el tipo de acción es inválido
             message = "<p>Por favor, detalla las observaciones antes de continuar...</p>" +
                 "<div class='d-flex justify-content-center'>" +
                 "<button type='button' class='btn btn-secondary' data-bs-dismiss='modal' aria-label='Close'>Cancelar</button>" +
                 "</div>";
-        } else if (type === "accept") {
-            message = "<p>Completa la siguiente información para poder aceptar el caso</p><form action='/jdc' method='post'>" +
+        } else if (type === "accept") { // Verificar si el tipo de acción es "aceptar"
+            message = "<p>Completa la siguiente información para poder aceptar el caso</p><form action='/jdc' method='post'>" + // Definir el formulario con la acción a procesar
                 "<div class='form-group'>" +
                 "<label for='programmer'><strong>Programador asignado:</strong></label>" +
                 "<select class='form-control form-select' id='programmer' name='programmer'>";
 
             <%
+                // Iterar la lista de programadores para mostrarlos en el select
                 try {
                     for (Map.Entry<Integer, String> programmer : listNames.fetchProgramerListNames(user.getId(), 1).entrySet()) {
             %>
-            message += "<option value='<%= programmer.getKey() %>'><%= programmer.getValue() %></option>";
+            message += "<option value='<%= programmer.getKey() %>'><%= programmer.getValue() %></option>"; // Definir las opciones del select
             <%
                     }
                 } catch (Exception e) {
@@ -223,6 +245,7 @@
                 "<label for='tester'><strong>Probador asignado:</strong></label>" +
                 "<select class='form-control form-select' id='tester' name='tester'>";
             <%
+                // Lo mismo para los probadores
                 try {
                     for (Map.Entry<Integer, String> tester : listNames.fetchTestersListNames(user.getId(), 1).entrySet()) {
             %>
@@ -237,7 +260,7 @@
                 "</div>" +
                 "<div class='form-group'>" +
                 "<label for='observations'><strong>Observaciones:</strong></label>" +
-                "<textarea id='observations' name='observations' class='form-control' rows='3' readonly>" + observations + "</textarea>" +
+                "<textarea id='observations' name='observations' class='form-control' rows='3' readonly>" + observations + "</textarea>" + // Definir las observaciones traidas desde el formulario original
                 "</div>" +
                 "<div class='form-group'>" +
                 "<label for='due_date'><strong>Fecha de entrega:</strong></label>" +
@@ -253,7 +276,7 @@
         } else {
             message = "<p>¿Estás seguro que deseas rechazar este caso?</p>" +
                 "<div class='d-flex justify-content-center gap-2'>" +
-                    "<a class='btn btn-danger mr-2 text-white' href='/jdc?action=deny_ticket&id=" + ticket.id + "&observations=" + observations + "'>Confirmar</a>" +
+                    "<a class='btn btn-danger mr-2 text-white' href='/jdc?action=deny_ticket&id=" + ticket.id + "&observations=" + observations + "'>Confirmar</a>" + // Definir la acción a procesar en el servlet
                 "<button type='button' class='btn btn-secondary mr-2' data-bs-dismiss='modal' aria-label='Close'>Cancelar</button>" +
                 "</div>";
         }
@@ -262,21 +285,28 @@
     }
 
     function validateObservations(ticket, length, type) {
-        let observations = document.getElementById("observations").value;
+        let observations = document.getElementById("observations").value; // Obteniendo el campo de las observaciones
+
+        // Verificar si las observaciones cumplen con la longitud mínima
         if (observations.length >= length) {
-            message = "<p>¿Estás seguro que deseas " + (type === "accept" ? "aceptar" : "rechazar") + " este caso?</p>" +
+            /*
+                Aquí se utilizan varios operadores ternarios para determinar el
+                tipo de solicitud a procesar y en base a ello definir el contenido del modal
+            */
+            // Definiendo por medio de una variable el contenido a mostrar en el modal
+            message = "<p>¿Estás seguro que deseas " + (type === "accept" ? "aceptar" : "rechazar") + " este caso?</p>" + // Definiendo el mensaje a mostrar
                 "<div class='d-flex justify-content-center gap-2'>" +
                 "<a " +
-                "class='btn " + (type === "accept" ? "btn-success" : "btn-danger") + " mr-2 text-white' " +
-                "href='/jdc?action=" + (type === "accept" ? "accept_ticket" : "denny_ticket") + "'" +
+                "class='btn " + (type === "accept" ? "btn-success" : "btn-danger") + " mr-2 text-white' " + // Definiendo el color del botón
+                "href='/jdc?action=" + (type === "accept" ? "accept_ticket" : "denny_ticket") + "'" + // Definiendo la acción a procesar en el servlet
                 ">" +
-                (type === "accept" ? "Confirmar" : "Rechazar") +
+                (type === "accept" ? "Confirmar" : "Rechazar") + // Definiendo el texto del botón
                 "</a>" +
                 "<button type='button' class='btn btn-secondary mr-2' data-bs-dismiss='modal' aria-label='Close'>Cancelar</button>" +
                 "</div>";
-            loadConfirmTicket(ticket, type, observations);
+            loadConfirmTicket(ticket, type, observations); // Cargando el modal con el contenido definido envando el ticket, el tipo de acción y las observaciones
         } else {
-            loadConfirmTicket(null, "invalid", null);
+            loadConfirmTicket(null, "invalid", null); // Cargando el modal con un mensaje de error|
         }
     }
 </script>
