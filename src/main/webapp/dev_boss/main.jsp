@@ -42,7 +42,6 @@
             request.setAttribute("info", "Ha ocurrido un error al aceptar el ticket...");
         } else if(Objects.equals(request.getParameter("info"), "error_denny_ticket")) {
             request.setAttribute("info", "Ha ocurrido un error al rechazar el ticket...");
-
         }
     }
 %>
@@ -54,17 +53,9 @@
     <title>Jefe de Desarrollo - Main</title>
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark navbar-expand-sm">
-    <div class="container-fluid">
-        <div class="navbar-nav me-auto">
-            <a class="nav-link active" aria-current="page" href="#">Inicio</a>
-            <a class="nav-link" href="supervise.jsp">Supervisar</a>
-        </div>
-        <div class="navbar-nav ms-auto">
-            <a class="nav-link btn btn-danger text-white" href="../session_handler?operacion=logout">Cerrar sesión</a>
-        </div>
-    </div>
-</nav>
+
+<jsp:include page="../navbar.jsp" />
+
 <main class="container mt-3">
     <div>
         <h1>Bienvenido <%= user.getName() %></h1>
@@ -89,7 +80,7 @@
                     if(new_tickets == null || new_tickets.isEmpty()) {
                 %>
                     <tr>
-                        <td colspan="5" class="text-center">Por el momento no hay tickets solicitados...</td>
+                        <td colspan="5" class="text-center">Por el momento no hay casos solicitados...</td>
                     </tr>
                 <%
                     } else {
@@ -229,7 +220,7 @@
             message += "</select>" +
                 "</div>" +
                 "<div class='form-group'>" +
-                "<label for='tester'><strong>Programador asignado:</strong></label>" +
+                "<label for='tester'><strong>Probador asignado:</strong></label>" +
                 "<select class='form-control form-select' id='tester' name='tester'>";
             <%
                 try {
@@ -262,7 +253,7 @@
         } else {
             message = "<p>¿Estás seguro que deseas rechazar este caso?</p>" +
                 "<div class='d-flex justify-content-center gap-2'>" +
-                "<a class='btn btn-danger mr-2 text-white' href='/jdc?action=deny_ticket&id=" + ticket.id + "&observations=" + observations + "'>Confirmar</a>" +
+                    "<a class='btn btn-danger mr-2 text-white' href='/jdc?action=deny_ticket&id=" + ticket.id + "&observations=" + observations + "'>Confirmar</a>" +
                 "<button type='button' class='btn btn-secondary mr-2' data-bs-dismiss='modal' aria-label='Close'>Cancelar</button>" +
                 "</div>";
         }

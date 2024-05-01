@@ -2,7 +2,8 @@
 <%@ page import="com.ticket.catedrapoo2.beans.Ticket" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="com.ticket.catedrapoo2.beans.Bitacora" %><%--
+<%@ page import="com.ticket.catedrapoo2.beans.Bitacora" %>
+<%--
   Created by IntelliJ IDEA.
   User: flore
   Date: 28/4/2024
@@ -16,7 +17,7 @@
     HttpSession currentSession = request.getSession(false);
     UserSession user = (UserSession) currentSession.getAttribute("user");
 
-    if(user == null || user.getRole_id() != 1) {
+    if (user == null || user.getRole_id() != 1) {
         response.sendRedirect("../login.jsp");
         return;
     }
@@ -37,20 +38,13 @@
     <title>Jefe de Desarrollo - Supervisar</title>
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark navbar-expand-sm">
-    <div class="container-fluid">
-        <div class="navbar-nav me-auto">
-            <a class="nav-link active" aria-current="page" href="main.jsp">Inicio</a>
-            <a class="nav-link" href="#">Supervisar</a>
-        </div>
-        <div class="navbar-nav ms-auto">
-            <a class="nav-link btn btn-danger text-white" href="../session_handler?operacion=logout">Cerrar sesión</a>
-        </div>
-    </div>
-</nav>
+
+<jsp:include page="../navbar.jsp"/>
+
 <main class="container mt-3">
     <div>
-        <h1>Bienvenido <%= user.getName() %></h1>
+        <h1>Bienvenido <%= user.getName() %>
+        </h1>
         <p class="small"> Jefe de Desarrollo</p>
     </div>
     <div>
@@ -69,65 +63,69 @@
                 <tbody>
                 <%
                     HashMap<String, Ticket> all_tickets = (HashMap<String, Ticket>) request.getAttribute("all_tickets");
-                    if(all_tickets == null || all_tickets.isEmpty()) {
+                    if (all_tickets == null || all_tickets.isEmpty()) {
                 %>
-                    <tr>
-                        <td colspan="5">No hay registro casos aperturados</td>
-                    </tr>
+                <tr>
+                    <td colspan="5">No hay registro casos aperturados</td>
+                </tr>
                 <%
-                    } else {
-                        for (Ticket ticket : all_tickets.values()) {
-                            // Convertir el HashMap a un array de objetos en JavaScript
-                            StringBuilder logsArray = new StringBuilder("[");
-                            for (Map.Entry<Integer, Bitacora> log : ticket.getLogs().entrySet()) {
-                                logsArray.append("{")
-                                        .append("\"id\": \"").append(log.getValue().getId()).append("\",")
-                                        .append("\"code_ticket\": \"").append(log.getValue().getCode()).append("\",")
-                                        .append("\"name\": \"").append(log.getValue().getName()).append("\",")
-                                        .append("\"description\": \"").append(log.getValue().getDescription().replace("\r\n", "\\n")).append("\",")
-                                        .append("\"percent\": \"").append(log.getValue().getPercent()).append("\",")
-                                        .append("\"programmer_name\": \"").append(log.getValue().getProgrammer_name()).append("\",")
-                                        .append("\"created_at\": \"").append(log.getValue().getCreated_at()).append("\"")
-                                        .append("},");
-                            }
-                            if(logsArray.charAt(logsArray.length() - 1) == ',') {
-                                logsArray.deleteCharAt(logsArray.length() - 1); // Eliminar la última coma
-                            }
-                            logsArray.append("]");
-                            String description = ticket.getDescription().replace("\r\n", "\\n");
-                            String observations = ticket.getObservations().replace("\r\n", "\\n");
+                } else {
+                    for (Ticket ticket : all_tickets.values()) {
+                        // Convertir el HashMap a un array de objetos en JavaScript
+                        StringBuilder logsArray = new StringBuilder("[");
+                        for (Map.Entry<Integer, Bitacora> log : ticket.getLogs().entrySet()) {
+                            logsArray.append("{")
+                                    .append("\"id\": \"").append(log.getValue().getId()).append("\",")
+                                    .append("\"code_ticket\": \"").append(log.getValue().getCode()).append("\",")
+                                    .append("\"name\": \"").append(log.getValue().getName()).append("\",")
+                                    .append("\"description\": \"").append(log.getValue().getDescription().replace("\r\n", "\\n")).append("\",")
+                                    .append("\"percent\": \"").append(log.getValue().getPercent()).append("\",")
+                                    .append("\"programmer_name\": \"").append(log.getValue().getProgrammer_name()).append("\",")
+                                    .append("\"created_at\": \"").append(log.getValue().getCreated_at()).append("\"")
+                                    .append("},");
+                        }
+                        if (logsArray.charAt(logsArray.length() - 1) == ',') {
+                            logsArray.deleteCharAt(logsArray.length() - 1); // Eliminar la última coma
+                        }
+                        logsArray.append("]");
+                        String description = ticket.getDescription().replace("\r\n", "\\n");
+                        String observations = ticket.getObservations().replace("\r\n", "\\n");
                 %>
-                    <tr>
-                        <td><%= ticket.getCode() %></td>
-                        <td><%= ticket.getBoss_name() %></td>
-                        <td><%= ticket.getName() %></td>
-                        <td><%= ticket.getCreated_at() %></td>
-                        <td>
-                            <button
+                <tr>
+                    <td><%= ticket.getCode() %>
+                    </td>
+                    <td><%= ticket.getBoss_name() %>
+                    </td>
+                    <td><%= ticket.getName() %>
+                    </td>
+                    <td><%= ticket.getCreated_at() %>
+                    </td>
+                    <td>
+                        <button
                                 class="btn btn-primary justify-content-center"
                                 data-bs-toggle="modal"
                                 data-bs-target="#ticketModal"
                                 onclick='loadTicketInfo({
-                                    id: <%= ticket.getId() %>,
-                                    code: "<%= ticket.getCode() %>",
-                                    state: "<%= ticket.getState() %>",
-                                    title: "<%= ticket.getName() %>",
-                                    description: "<%= description %>",
-                                    logs: <%= logsArray.toString() %>,
-                                    observations: "<%= observations %>",
-                                    requester_name: "<%= ticket.getBoss_name() %>",
-                                    requester_area_name: "<%= ticket.getRequester_area_name() %>",
-                                    dev_boss_name: "<%= ticket.getDev_boss_name() %>",
-                                    programmer_name: "<%= ticket.getProgrammer_name() %>",
-                                    tester_name: "<%= ticket.getTester_name() %>",
-                                    created_at: "<%= ticket.getCreated_at() %>",
-                                    due_date: "<%= ticket.getDue_date() %>",
-                                })'
-                            >
-                                Ver detalles
-                            </button>
-                        </td>
-                    </tr>
+                                        id: <%= ticket.getId() %>,
+                                        code: "<%= ticket.getCode() %>",
+                                        state: "<%= ticket.getState() %>",
+                                        title: "<%= ticket.getName() %>",
+                                        description: "<%= description %>",
+                                        logs: <%= logsArray.toString() %>,
+                                        observations: "<%= observations %>",
+                                        requester_name: "<%= ticket.getBoss_name() %>",
+                                        requester_area_name: "<%= ticket.getRequester_area_name() %>",
+                                        dev_boss_name: "<%= ticket.getDev_boss_name() %>",
+                                        programmer_name: "<%= ticket.getProgrammer_name() %>",
+                                        tester_name: "<%= ticket.getTester_name() %>",
+                                        created_at: "<%= ticket.getCreated_at() %>",
+                                        due_date: "<%= ticket.getDue_date() %>",
+                                        })'
+                        >
+                            Ver detalles
+                        </button>
+                    </td>
+                </tr>
                 <%
                         }
                     }
@@ -158,7 +156,7 @@
         console.log(ticket.logs)
         let logs;
 
-        if(ticket.logs.length === 0) {
+        if (ticket.logs.length === 0) {
             logs = "<tr><td colspan='5'>No hay bitácoras registradas</td></tr>";
         } else {
             logs = ticket.logs.map(log => {
@@ -175,8 +173,8 @@
         document.getElementById("ticketModalBody").innerHTML = "<form>" +
             "<div class='row g-2'>" +
             "<div class='form-group col-md-4'>" +
-            "<label for='code'><strong>ID:</strong></label>" +
-            "<input type='text' id='code' class='form-control' value='" + ticket.id + "' readonly>" +
+            "<label for='id'><strong>ID:</strong></label>" +
+            "<input type='text' id='id' class='form-control' value='" + ticket.id + "' readonly>" +
             "</div>" +
             "<div class='form-group col-md-4'>" +
             "<label for='code'><strong>Código:</strong></label>" +

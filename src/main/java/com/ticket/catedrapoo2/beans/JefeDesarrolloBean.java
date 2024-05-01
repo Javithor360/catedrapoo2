@@ -8,16 +8,6 @@ import java.util.HashMap;
 public class JefeDesarrolloBean {
 
     /*
-        Definiendo atributos útiles para el manejo de la información
-        de tickets relacionados desde la parte del jefe de desarrollo
-     */
-    private HashMap<String, Ticket> tickets_request;
-    private HashMap<String, Ticket> all_tickets;
-    private HashMap<Integer, String> programmers_names;
-    private HashMap<Integer, String> testers_names;
-    private HashMap<Integer, JefeDesarrolloBean> available_dev_bosses;
-
-    /*
         Métodos propios de la clase
      */
 
@@ -260,46 +250,5 @@ public class JefeDesarrolloBean {
         stmt.close();
 
         conexion.closeConnection();
-    }
-
-    // Getters y setters de los atributos
-    public HashMap<String, Ticket> getTickets_request() {
-        return this.tickets_request;
-    }
-
-    public void setTickets_request(HashMap<String, Ticket> new_tickets_request) {
-        this.tickets_request = new_tickets_request;
-    }
-
-    public HashMap<Integer, String> getProgrammers_names() {
-        return this.programmers_names;
-    }
-
-    public void setProgrammers_names(HashMap<Integer, String> programmers_names) {
-        this.programmers_names = programmers_names;
-    }
-
-    public HashMap<Integer, String> getTesters_names() {
-        return this.testers_names;
-    }
-
-    public void setTesters_names(HashMap<Integer, String> testers_names) {
-        this.testers_names = testers_names;
-    }
-
-    public HashMap<String, Ticket> getAll_tickets() {
-        return this.all_tickets;
-    }
-
-    public void setAll_tickets(HashMap<String, Ticket> all_tickets) {
-        this.all_tickets = all_tickets;
-    }
-
-    public HashMap<Integer, JefeDesarrolloBean> getAvailables_dev_bosses() {
-        return available_dev_bosses;
-    }
-
-    public void setAvailables_dev_bosses(HashMap<Integer, JefeDesarrolloBean> available_dev_bosses) {
-        this.available_dev_bosses = available_dev_bosses;
     }
 }

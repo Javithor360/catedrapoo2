@@ -1,8 +1,4 @@
-package com.ticket.catedrapoo2.models;
-
-import com.ticket.catedrapoo2.beans.JefeArea;
-import com.ticket.catedrapoo2.beans.UserSession;
-import com.ticket.catedrapoo2.beans.Conexion;
+package com.ticket.catedrapoo2.beans;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

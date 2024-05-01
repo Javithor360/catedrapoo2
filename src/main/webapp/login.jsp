@@ -47,7 +47,7 @@
                     <form action="session_handler" method="post" autocomplete="off">
                         <div class="form-group">
                             <label for="email">Correo</label>
-                            <input type="text" class="form-control" value="jose.aguilar@correo.com" id="email" name="email" placeholder="Ingrese su usuario" autocomplete="off">
+                            <input type="text" class="form-control" value="helena.valladares@correo.com" id="email" name="email" placeholder="Ingrese su usuario" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="password">Contraseña</label>

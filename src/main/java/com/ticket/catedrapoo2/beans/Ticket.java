@@ -2,7 +2,10 @@ package com.ticket.catedrapoo2.beans;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 public class Ticket {
     private int id;
@@ -57,6 +60,20 @@ public class Ticket {
         this.state_id = state_id;
         this.due_date = due_date;
         this.created_at = created_at;
+    }
+
+    // Obtener el valor del porcentaje en el registro más reciente en base a su fecha de creación
+    public double get_latest_percent (Ticket t) {
+        HashMap<Integer, Bitacora> bMap = t.getLogs();
+
+        List<Bitacora> bitacoras = new ArrayList<>(bMap.values());
+
+        if(!bitacoras.isEmpty()) {
+            bitacoras.sort(Comparator.comparing(Bitacora::getCreated_at).reversed());
+            return bitacoras.get(0).getPercent();
+        } else {
+            return 0;
+        }
     }
 
     public void addBitacora (Bitacora bitacora) {
