@@ -13,6 +13,7 @@
 
     // En caso de que haya un usuario definido, entonces según su rol redigirá a su panel correspondiente
     if(user != null) {
+
         if(user.getRole_id() == 1) {
             response.sendRedirect("dev_boss/main.jsp");
         } else if(user.getRole_id() == 2) {
@@ -24,10 +25,10 @@
         } else {
             response.sendRedirect("login.jsp");
         }
+
         return;
     }
 %>
-
 
 <html>
 <head>
@@ -47,11 +48,11 @@
                     <form action="session_handler" method="post" autocomplete="off">
                         <div class="form-group">
                             <label for="email">Correo</label>
-                            <input type="text" class="form-control" value="helena.valladares@correo.com" id="email" name="email" placeholder="Ingrese su usuario" autocomplete="off">
+                            <input type="text" class="form-control" value="admin" id="email" name="email" placeholder="Ingrese su usuario" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="password">Contraseña</label>
-                            <input type="password" class="form-control" value="1234" id="password" name="password" placeholder="Ingrese su contraseña" autocomplete="off">
+                            <input type="password" class="form-control" value="superadmin" id="password" name="password" placeholder="Ingrese su contraseña" autocomplete="off">
                         </div>
                         <input type="hidden" name="operacion" value="login" />
                         <input type="submit" value="Iniciar sesión" class="btn btn-primary btn-block" />

@@ -47,6 +47,7 @@
         <h1>Bienvenido <%= user.getName() %></h1>
         <p class="small"> Programador</p>
     </div>
+
     <div>
         <h3>Tus casos asignados</h3>
         <div class="table-container">

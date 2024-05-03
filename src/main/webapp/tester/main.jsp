@@ -13,7 +13,7 @@
     HttpSession currentSession = request.getSession(false);
     UserSession user = (UserSession) currentSession.getAttribute("user");
 
-    if(user == null || user.getRole_id() != 4) {
+    if (user == null || user.getRole_id() != 4) {
         response.sendRedirect("../login.jsp");
         return;
     }
@@ -25,7 +25,10 @@
 </head>
 <body>
 <h1>Bienvenido empleado de area funcional</h1>
-<h2>Tú eres <%= user.getName() %></h2>
-<a href="../session_handler?operacion=logout"><button>Salir</button></a>
+<h2>Tú eres <%= user.getName() %>
+</h2>
+<a href="../session_handler?operacion=logout">
+    <button>Salir</button>
+</a>
 </body>
 </html>

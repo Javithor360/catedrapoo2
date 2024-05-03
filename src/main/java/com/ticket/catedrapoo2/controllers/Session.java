@@ -37,6 +37,18 @@ public class Session extends HttpServlet {
             // Parámetros obtenidos del formulario
             final String email = request.getParameter("email");
             final String password = request.getParameter("password");
+
+            // Si las credenciales son las del superadmin se redirige a la vista de superadmin
+            if("admin".equals(email) && "superadmin".equals(password)) {
+                response.sendRedirect("admin/main.jsp");
+
+                UserSession admin = new UserSession(0, "Super Admin", "admin", "M", null, 0, null);
+
+                currentSession.setAttribute("user", admin);
+
+                return;
+            }
+
             try {
                 // Instancia de la clase conexión para comprobar los datos
                 Conexion con = new Conexion();
@@ -81,6 +93,7 @@ public class Session extends HttpServlet {
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
+
         } else if (operacion.equals("logout")) {
             currentSession.setAttribute("user", null);
             currentSession.invalidate();
