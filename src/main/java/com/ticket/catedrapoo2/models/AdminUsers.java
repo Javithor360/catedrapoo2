@@ -80,7 +80,6 @@ public class AdminUsers {
                 e.printStackTrace();
             }
         }
-        System.out.println("AQUI VAN LOS USUARIOS" + usuarios);
         return usuarios;
     }
 
