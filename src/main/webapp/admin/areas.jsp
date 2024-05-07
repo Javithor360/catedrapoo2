@@ -5,7 +5,16 @@
   Time: 12:15 a. m.
   To change this template use File | Settings | File Templates.
 --%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    // Validar si el usuario tiene permisos para acceder a esta página
+
+    // Mandar a llamar el controlador con petición Get
+
+    // Recibir la respuesta del controlador
+    
+%>
 <html lang="es">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,6 +39,10 @@
         </tr>
         </thead>
         <tbody>
+        <%
+            // Recorrer las áreas funcionales
+
+        %>
         <tr>
             <td>FIN</td>
             <td>Finanzas</td>
@@ -47,7 +60,6 @@
 
     <div class="d-flex justify-content-center">
         <button class="btn btn-primary">Agregar</button>
-        <button class="btn btn-secondary">Salir</button>
     </div>
 
 </main>
