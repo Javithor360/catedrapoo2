@@ -2,7 +2,10 @@ package com.ticket.catedrapoo2.controllers;
 
 import com.ticket.catedrapoo2.beans.AreaBean;
 import com.ticket.catedrapoo2.beans.UserSession;
+import com.ticket.catedrapoo2.beans.Users;
+import com.ticket.catedrapoo2.models.AdminUsers;
 import com.ticket.catedrapoo2.models.Area;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,9 +16,13 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
-@WebServlet(name = "AdminController", urlPatterns = {"/admin"})
+@WebServlet(name = "AdminController", value = "/adminController")
 public class AdminController extends HttpServlet {
 
     // Instancia al Modelo
@@ -28,7 +35,65 @@ public class AdminController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        processRequest(request, response);
+        String operacion = request.getParameter("operacion");
+
+        if ("nuevoEmpleado".equals(operacion)) {
+
+            String name = request.getParameter("name");
+            String email = request.getParameter("email");
+
+            String birthdayString = request.getParameter("birthday");
+            Date birthday = null;
+
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                birthday = dateFormat.parse(birthdayString);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String password = request.getParameter("password");
+            String gender = request.getParameter("gender");
+            String rol = request.getParameter("rol");
+
+            Date created = new Date(Calendar.getInstance().getTime().getTime());
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String createdString = dateFormat.format(created);
+
+            Users user = new Users(name,email,password,gender,birthday,rol,created);
+
+            AdminUsers operaciones = new AdminUsers();
+            boolean resultado = operaciones.agregarUsuario(user);
+            System.out.println("RESULTADO" + resultado);
+
+            if (resultado == true){
+                request.setAttribute("mensaje", "Empleado Agregado Correctamente");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/menuEmpleado.jsp");
+                dispatcher.forward(request, response);
+            }else {
+                request.setAttribute("mensaje", "Error al guardar");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/menuEmpleado.jsp");
+                dispatcher.forward(request, response);
+            }
+
+        }else if ("eliminar".equals(operacion)){
+            int id = Integer.parseInt(request.getParameter("id"));
+
+            AdminUsers operaciones = new AdminUsers();
+
+            boolean res = operaciones.eliminarEmpleado(id);
+
+            if (res == true){
+                request.setAttribute("mensaje", "La empleado se ha eliminado correctamente");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/menuEmpleado.jsp");
+                dispatcher.forward(request, response);
+            }else {
+                request.setAttribute("mensaje", "Error al eliminar");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/menuEmpleado.jsp");
+                dispatcher.forward(request, response);
+            }
+
+        }
     }
 
     private void processRequest(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {

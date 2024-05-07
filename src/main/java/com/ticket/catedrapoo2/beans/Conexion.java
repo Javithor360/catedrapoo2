@@ -31,6 +31,11 @@ public class Conexion {
     // Método para obtener los valores del ResultSet
     public ResultSet getRs() { return rs; }
 
+    // Método para obtener la conexión establecida
+    public Connection getConnection() {
+        return connection;
+    }
+
     // Método para fijar la tabla de resultado de la setencia SQL realizada
     public void setRs(String sql) {
         try {
