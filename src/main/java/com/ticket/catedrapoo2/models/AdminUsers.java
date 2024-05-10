@@ -66,8 +66,6 @@ public class AdminUsers {
                         rs.getDate("created_at")
                 );
                 usuarios.add(usuario);
-
-
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,6 +100,88 @@ public class AdminUsers {
             e.printStackTrace();
         }
         return eliminado;
+    }
+
+    public Users buscarId(int id) {
+        Connection cn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Users user = null;
+
+        try {
+            cn = new Conexion().getConnection();
+            String tsql = "SELECT id, name, email, gender, birthday, role_id FROM users WHERE id = ?";
+            ps = cn.prepareStatement(tsql);
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                user = new Users();
+                user.setId(rs.getInt("id"));
+                user.setName(rs.getString("name"));
+                user.setEmail(rs.getString("email"));
+                user.setGender(rs.getString("gender"));
+                user.setBirthday(rs.getDate("birthday"));
+                user.setRole_id(rs.getString("role_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (cn != null) cn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return user;
+    }
+
+
+    public boolean actualizarEmpleado(Users user) {
+        Connection cn = null;
+        PreparedStatement ps = null;
+
+        boolean res = false;
+
+        try {
+            cn = new Conexion().getConnection();
+
+            String sql = "UPDATE users SET name = ?, email = ?, gender = ?, birthday = ?, role_id = ? WHERE id = ?";
+
+            ps = cn.prepareStatement(sql);
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getGender());
+            ps.setDate(4, new java.sql.Date(user.getBirthday().getTime()));
+            ps.setString(5, user.getRole_id());
+            ps.setInt(6, user.getId());
+
+            int filasActualizadas = ps.executeUpdate();
+
+            if (filasActualizadas > 0) {
+                res = true;
+            } else {
+                res = false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (cn != null) {
+                    cn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return res;
     }
 
 }

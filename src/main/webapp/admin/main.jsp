@@ -52,7 +52,7 @@
     <div class="my-4">
         <ul class="list-group">
             <li class="list-group-item text-center">
-                <a href="menuEmpleado.jsp">Nuevo Empleado</a>
+                <a href="../admin/menuEmpleado.jsp">Nuevo Empleado</a>
             </li>
             <li class="list-group-item text-center">
                 <a href="areas.jsp?action=index">Gestión de Áreas Funcionales</a>

@@ -6,20 +6,18 @@
 <html>
 <head>
     <title>Listado de Ventas</title>
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
-<body>
-
+<body>l
 <div class="container mt-3">
     <center>
-        <h1>Listado de Ventas</h1>
+        <h1>Listado de Empleados</h1>
     </center>
 </div>
 <div class="container mt-5">
     <a class="btn btn-info mb-3" href="empleados.jsp">Agregar Empleado</a>
-    <table border="1">
-        <thead>
+    <table class="table table-bordered">
+        <thead class="thead-dark">
         <tr>
             <th>Nombre</th>
             <th>Correo</th>
@@ -36,7 +34,7 @@
             if (user.isEmpty()) {
         %>
         <tr>
-            <td colspan="4">No hay emplados registrados.</td>
+            <td colspan="6" class="text-center">No hay empleados registrados.</td>
         </tr>
         <% } else {
             for (Users user1 : user) {
@@ -47,21 +45,24 @@
             <td><%= user1.getGender() %></td>
             <td><%= user1.getRole_id() %></td>
             <td><%= user1.getCreated_at() %></td>
-            <td> <button class="btn btn-danger"
-                         onclick="alerta(<%= user1.getId() %>)">Eliminar</button>
-                <button class="btn btn-primary"
-                        onclick="modif(<%= user1.getId() %>)">Modificar</button>
-
+            <td>
+                <button class="btn btn-danger" onclick="alerta(<%= user1.getId() %>)">Eliminar</button>
+                <button class="btn btn-primary" onclick="modif(<%= user1.getId() %>)">Modificar</button>
             </td>
         </tr>
         <% }
-        }
-        %>
+        } %>
         </tbody>
     </table>
     <c:if test="${not empty requestScope.mensaje}">
         <div class="alert alert-success mt-5">
             <strong>Operación: </strong><c:out value="${requestScope.mensaje}"/>
+        </div>
+    </c:if>
+
+    <c:if test="${not empty requestScope.error}">
+        <div class="alert alert-danger mt-5">
+            <strong>Error!: </strong><c:out value="${requestScope.error}"/>
         </div>
     </c:if>
     <script>
@@ -95,7 +96,7 @@
         function modif(id) {
             var opcion = confirm("Esta seguro de modificar este registro?");
             if (opcion == true) {
-                location.href ="Agregar.jsp?id="+id;
+                location.href ="empleados.jsp?id="+id;
             }
         }
     </script>

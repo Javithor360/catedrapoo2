@@ -3,14 +3,15 @@ package com.ticket.catedrapoo2.beans;
 import java.util.Date;
 
 public class Users {
-    public int id;
-    public String name;
-    public String email;
-    public String password;
-    public String gender;
-    public Date birthday;
-    public String role_id;
-    public Date created_at;
+    private int id;
+    private String name;
+    private String email;
+    private String password;
+    private String gender;
+    private Date birthday;
+    private String role_id;
+
+    private Date created_at;
 
     //solo para inicializar
     public Users() {
@@ -41,15 +42,23 @@ public class Users {
     }
 
 
+    //ocupo para listar una parte de todo el registro
     public Users(int id, String name, String email, String gender, String role_id, Date created_at) {
         this.id = id;
         this.name = name;
         this.email = email;
-        this.password = password;
         this.gender = gender;
-        this.birthday = birthday;
         this.role_id = role_id;
         this.created_at = created_at;
+    }
+
+    public Users (int id, String name, String email, String gender, Date birthday, String role_id ){
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.gender = gender;
+        this.role_id = role_id;
+        this.birthday = birthday;
     }
 
     public int getId() {
@@ -113,6 +122,7 @@ public class Users {
     public void setRole_id(String role_id) {
         this.role_id = role_id;
     }
+
 
     // Getter y Setter para 'created_at'
     public Date getCreated_at() {

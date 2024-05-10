@@ -64,17 +64,14 @@ public class AdminController extends HttpServlet {
 
             AdminUsers operaciones = new AdminUsers();
             boolean resultado = operaciones.agregarUsuario(user);
-            System.out.println("RESULTADO" + resultado);
 
-            if (resultado == true){
-                request.setAttribute("mensaje", "Empleado Agregado Correctamente");
-                RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/menuEmpleado.jsp");
-                dispatcher.forward(request, response);
-            }else {
-                request.setAttribute("mensaje", "Error al guardar");
-                RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/menuEmpleado.jsp");
-                dispatcher.forward(request, response);
+            if (resultado) {
+                request.setAttribute("mensaje", "Agregado correctamente");
+            } else {
+                request.setAttribute("Error", "Error al Crear");
             }
+
+            response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
 
         }else if ("eliminar".equals(operacion)){
             int id = Integer.parseInt(request.getParameter("id"));
@@ -83,16 +80,44 @@ public class AdminController extends HttpServlet {
 
             boolean res = operaciones.eliminarEmpleado(id);
 
-            if (res == true){
-                request.setAttribute("mensaje", "La empleado se ha eliminado correctamente");
-                RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/menuEmpleado.jsp");
-                dispatcher.forward(request, response);
-            }else {
-                request.setAttribute("mensaje", "Error al eliminar");
-                RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/menuEmpleado.jsp");
-                dispatcher.forward(request, response);
+            if (res) {
+                request.setAttribute("mensaje", "Eliminado correctamente");
+            } else {
+                request.setAttribute("Error!", "Error al eliminar");
             }
 
+            response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
+
+        }else if ("modificarEmpleado".equals(operacion)){
+            int id = Integer.parseInt(request.getParameter("id"));
+            String name = request.getParameter("name");
+            String email = request.getParameter("email");
+
+            String birthdayString = request.getParameter("birthday");
+            Date birthday = null;
+
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                birthday = dateFormat.parse(birthdayString);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String gender = request.getParameter("gender");
+            String rol = request.getParameter("rol");
+
+            Users user = new Users(id, name, email,gender, birthday,rol);
+
+            AdminUsers operaciones = new AdminUsers();
+
+            boolean res = operaciones.actualizarEmpleado(user);
+
+            if (res) {
+                request.setAttribute("mensaje", "Modificado correctamente");
+            } else {
+                request.setAttribute("Error", "Error al modificar");
+            }
+
+            response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
         }
     }
 
