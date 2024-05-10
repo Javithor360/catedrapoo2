@@ -19,7 +19,6 @@
         response.sendRedirect("login.jsp");
     }
 
-    // Mandar a llamar el controlador con petición Get
     String actionParam = request.getParameter("action");
 
     if (actionParam == null || !actionParam.equals("index")) {
@@ -88,7 +87,9 @@
     </table>
 
     <div class="d-flex justify-content-center">
-        <button class="btn btn-primary">Agregar</button>
+        <a href="/admin/areasCreate.jsp" class="btn btn-primary">
+            Crear
+        </a>
     </div>
 
 </main>

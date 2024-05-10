@@ -1,4 +1,6 @@
-<%--
+<%@ page import="com.ticket.catedrapoo2.beans.UserSession" %>
+<%@ page import="com.ticket.catedrapoo2.beans.MapeoBean" %>
+<%@ page import="java.util.HashMap" %><%--
   Created by IntelliJ IDEA.
   User: oscar
   Date: 03/05/2024
@@ -6,6 +8,23 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    // Válidar si el usuario tiene permisos para acceder a la página
+    HttpSession currentSession = request.getSession(false);
+    UserSession user = (UserSession) currentSession.getAttribute("user");
+
+    if (user == null || user.getRole_id() != 0) {
+        response.sendRedirect("login.jsp");
+    }
+
+    String actionParam = request.getParameter("action");
+
+    if (actionParam == null || !actionParam.equals("index")) {
+        request.getRequestDispatcher("/admin/groups.jsp").forward(request, response);
+        return;
+    }
+
+%>
 <html lang="es">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,8 +37,10 @@
 <jsp:include page="../navbar.jsp"/>
 
 <main class="container mt-3">
-    <h1 class="text-center mb-4">Gestionando Grupos</h1>
-    <div class="text-center mb-2">Administra y visualiza el mapeo de integrantes de los distintos grupos de las Áreas Funcionales.</div>
+    <h1 class="text-center mb-4">Creando Nueva Área Funcional</h1>
+    <div class="text-center mb-2">Administra y visualiza el mapeo de integrantes de los distintos grupos de las Áreas
+        Funcionales.
+    </div>
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -31,38 +52,49 @@
         </tr>
         </thead>
         <tbody>
+        <%
+            HashMap<Integer, MapeoBean> grupos = (HashMap<Integer, MapeoBean>) request.getAttribute("grupos");
+
+            System.out.println(request.getAttribute("areas"));
+
+            if (grupos.size() > 0 && !grupos.isEmpty()) {
+                for (MapeoBean grupo : grupos.values()) {
+        %>
         <tr>
-            <td>1</td>
-            <td>Finanzas</td>
-            <td>Empleados Finanz...</td>
-            <td>José Aguilar</td>
-            <td><button class="btn btn-primary">Editar</button></td>
+            <td>
+                <%= grupo.getId() %>
+            </td>
+            <td>
+                <%= grupo.getName_area() %>
+            </td>
+            <td>
+                <%= grupo.getName_group() %>
+            </td>
+            <td>
+                <%= grupo.getName_boss() %>
+            </td>
+            <td>
+                <a href="groups.jsp?action=edit&id=<%= grupo.getId() %>" class="btn btn-primary">Editar</a>
+                <%--<a href="groups.jsp?action=delete&id=<%= grupo.getId() %>" class="btn btn-danger">Eliminar</a>--%>
+            </td>
         </tr>
+        <%
+            }
+
+        } else {
+        %>
         <tr>
-            <td>2</td>
-            <td>Comunicaciones</td>
-            <td>Programadores pa...</td>
-            <td>Rodrigo Carrasco</td>
-            <td><button class="btn btn-primary">Editar</button></td>
+            <td colspan="4">Sin Grupos Disponibles</td>
         </tr>
-        <tr>
-            <td>3</td>
-            <td>Finanzas</td>
-            <td>Empleados Comu...</td>
-            <td>María Alcano</td>
-            <td><button class="btn btn-primary">Editar</button></td>
-        </tr>
-        <tr>
-            <td>4</td>
-            <td>Comunicaciones</td>
-            <td>Programadores pa...</td>
-            <td>Jotaro Gutierrez</td>
-            <td><button class="btn btn-primary">Editar</button></td>
-        </tr>
+        <%
+            }
+        %>
         </tbody>
     </table>
     <div class="d-flex justify-content-center">
-        <button class="btn btn-secondary">Volver</button>
+        <a href="/admin/main.jsp" class="btn btn-primary">
+            Volver
+        </a>
     </div>
 </main>
 </body>

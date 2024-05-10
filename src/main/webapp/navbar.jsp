@@ -17,7 +17,8 @@
                 // de usuario que haya iniciado sesión.
                 if (user.getRole_id() == 0) {
             %>
-            <a class="nav-link" href="areas.jsp?action=index">Areas</a>
+            <a class="nav-link" href="/admin/areas.jsp">Areas</a>
+            <a class="nav-link" href="/admin/grupos.jsp">Grupos</a>
             <%
                 // Agregar los demás tipos de usuario con un else
                 // aquí si hace falta

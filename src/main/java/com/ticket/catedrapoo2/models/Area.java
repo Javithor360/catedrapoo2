@@ -10,10 +10,11 @@ import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
 public class Area {
-    // Métodos propios del MODELO  ================================================+
-
+    // Métodos propios del MODELO  ================================================
     public boolean agregarArea() {
-        return false;
+        String query = "INSERT INTO areas (name, prefix_code, boss_id, dev_boss_id) VALUES (?, ?, ?, ?)";
+
+        return true;
     }
 
     public HashMap<Integer, AreaBean> getAllAreas() throws SQLException {

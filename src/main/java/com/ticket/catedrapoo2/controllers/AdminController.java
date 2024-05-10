@@ -1,11 +1,10 @@
 package com.ticket.catedrapoo2.controllers;
 
-import com.ticket.catedrapoo2.beans.AreaBean;
+import com.ticket.catedrapoo2.beans.UserGroupBean;
 import com.ticket.catedrapoo2.beans.Users;
 import com.ticket.catedrapoo2.models.AdminUsers;
 import com.ticket.catedrapoo2.models.Area;
-import com.ticket.catedrapoo2.models.Grupo;
-import jakarta.servlet.RequestDispatcher;
+import com.ticket.catedrapoo2.models.Mapeo;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,11 +23,17 @@ public class AdminController extends HttpServlet {
 
     // Instancia al Modelo
     Area area = new Area();
-    Grupo grupo = new Grupo();
+    Mapeo map = new Mapeo();
+//    UserGroupBean = new UserGroups();
+    // Grupo grupo = new Grupo();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -37,7 +41,6 @@ public class AdminController extends HttpServlet {
         String operacion = request.getParameter("operacion");
 
         if ("nuevoEmpleado".equals(operacion)) {
-
             String name = request.getParameter("name");
             String email = request.getParameter("email");
 
@@ -121,7 +124,7 @@ public class AdminController extends HttpServlet {
     }
 
     private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
 
         // Corroborando si se envió una acción y el modelo a utilizar
@@ -137,7 +140,7 @@ public class AdminController extends HttpServlet {
             case "area":
                 handleAreaActions(request, response, action);
                 break;
-            case "grupo":
+            case "usergroup":
                 handleGrupoActions(request, response, action);
                 break;
         }
@@ -146,7 +149,7 @@ public class AdminController extends HttpServlet {
     private void handleAreaActions(final HttpServletRequest request, final HttpServletResponse response, final String action)
             throws ServletException, IOException {
         switch (action) {
-            case "display":
+            case "index":
                 displayAreas(request, response);
                 break;
             case "create":
@@ -160,14 +163,15 @@ public class AdminController extends HttpServlet {
                 break;
             default:
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no válida");
+                break;
         }
     }
 
     private void handleGrupoActions(final HttpServletRequest request, final HttpServletResponse response, final String action)
-            throws ServletException, IOException {
+            throws ServletException, IOException, SQLException {
         switch (action) {
-            case "display":
-                displayGrupos(request, response);
+            case "index":
+                displayUsersGroups(request, response);
                 break;
             case "create":
                 // createGrupo(request, response);
@@ -180,6 +184,8 @@ public class AdminController extends HttpServlet {
                 break;
             default:
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no válida");
+                break;
+
         }
     }
 
@@ -197,14 +203,17 @@ public class AdminController extends HttpServlet {
     }
 
     // Acciones de Grupos ==========================================================================================
-    private void displayGrupos(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException, IOException {
+    private void displayUsersGroups(final HttpServletRequest request, final HttpServletResponse response)
+            throws SQLException {
+
         try {
-            request.setAttribute("grupos", grupo.getAllGrupos());
+            request.setAttribute("grupos", map.getAllMapeos());
             request.getRequestDispatcher("/admin/grupos.jsp").forward(request, response);
-        } catch (SQLException e) {
+
+        } catch (ServletException | IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
 }
