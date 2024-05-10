@@ -40,87 +40,93 @@ public class AdminController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String operacion = request.getParameter("operacion");
 
-        if ("nuevoEmpleado".equals(operacion)) {
-            String name = request.getParameter("name");
-            String email = request.getParameter("email");
+        switch (operacion) {
+            case "nuevoEmpleado":
+                String name = request.getParameter("name");
+                String email = request.getParameter("email");
+                String birthdayString = request.getParameter("birthday");
+                Date birthday = null;
 
-            String birthdayString = request.getParameter("birthday");
-            Date birthday = null;
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    birthday = dateFormat.parse(birthdayString);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
-            try {
+                String password = request.getParameter("password");
+                String gender = request.getParameter("gender");
+                String rol = request.getParameter("rol");
+                Date created = new Date(Calendar.getInstance().getTime().getTime());
+
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                birthday = dateFormat.parse(birthdayString);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            String password = request.getParameter("password");
-            String gender = request.getParameter("gender");
-            String rol = request.getParameter("rol");
+                String createdString = dateFormat.format(created);
 
-            Date created = new Date(Calendar.getInstance().getTime().getTime());
+                Users user = new Users(name, email, password, gender, birthday, rol, created);
+                AdminUsers operaciones = new AdminUsers();
+                boolean resultado = operaciones.agregarUsuario(user);
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String createdString = dateFormat.format(created);
+                if (resultado) {
+                    request.setAttribute("mensaje", "Agregado correctamente");
+                } else {
+                    request.setAttribute("Error", "Error al Crear");
+                }
 
-            Users user = new Users(name, email, password, gender, birthday, rol, created);
+                response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
+                break;
 
-            AdminUsers operaciones = new AdminUsers();
-            boolean resultado = operaciones.agregarUsuario(user);
+            case "eliminar":
+                int id = Integer.parseInt(request.getParameter("id"));
+                AdminUsers operacionesEliminar = new AdminUsers();
+                boolean resEliminar = operacionesEliminar.eliminarEmpleado(id);
 
-            if (resultado) {
-                request.setAttribute("mensaje", "Agregado correctamente");
-            } else {
-                request.setAttribute("Error", "Error al Crear");
-            }
+                if (resEliminar) {
+                    request.setAttribute("mensaje", "Eliminado correctamente");
+                } else {
+                    request.setAttribute("Error!", "Error al eliminar");
+                }
 
-            response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
+                response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
+                break;
 
-        } else if ("eliminar".equals(operacion)) {
-            int id = Integer.parseInt(request.getParameter("id"));
+            case "modificarEmpleado":
+                int idModificar = Integer.parseInt(request.getParameter("id"));
+                String nameModificar = request.getParameter("name");
+                String emailModificar = request.getParameter("email");
+                String birthdayStringModificar = request.getParameter("birthday");
+                Date birthdayModificar = null;
 
-            AdminUsers operaciones = new AdminUsers();
+                try {
+                    SimpleDateFormat dateFormatModificar = new SimpleDateFormat("yyyy-MM-dd");
+                    birthdayModificar = dateFormatModificar.parse(birthdayStringModificar);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
-            boolean res = operaciones.eliminarEmpleado(id);
+                String genderModificar = request.getParameter("gender");
+                String rolModificar = request.getParameter("rol");
 
-            if (res) {
-                request.setAttribute("mensaje", "Eliminado correctamente");
-            } else {
-                request.setAttribute("Error!", "Error al eliminar");
-            }
+                Users userModificar = new Users(idModificar, nameModificar, emailModificar, genderModificar, birthdayModificar, rolModificar);
+                AdminUsers operacionesModificar = new AdminUsers();
 
-            response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
+                boolean resModificar = operacionesModificar.actualizarEmpleado(userModificar);
 
-        } else if ("modificarEmpleado".equals(operacion)) {
-            int id = Integer.parseInt(request.getParameter("id"));
-            String name = request.getParameter("name");
-            String email = request.getParameter("email");
+                if (resModificar) {
+                    request.setAttribute("mensaje", "Modificado correctamente");
+                } else {
+                    request.setAttribute("Error", "Error al modificar");
+                }
 
-            String birthdayString = request.getParameter("birthday");
-            Date birthday = null;
+                response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
+                break;
 
-            try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                birthday = dateFormat.parse(birthdayString);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            String gender = request.getParameter("gender");
-            String rol = request.getParameter("rol");
-
-            Users user = new Users(id, name, email, gender, birthday, rol);
-
-            AdminUsers operaciones = new AdminUsers();
-
-            boolean res = operaciones.actualizarEmpleado(user);
-
-            if (res) {
-                request.setAttribute("mensaje", "Modificado correctamente");
-            } else {
-                request.setAttribute("Error", "Error al modificar");
-            }
-
-            response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
+            default:
+                // Manejar la posibilidad de que no se pase una operación válida
+                response.sendRedirect("errorPage.jsp");
+                break;
         }
+
+
     }
 
     private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
