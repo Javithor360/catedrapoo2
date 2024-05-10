@@ -1,6 +1,7 @@
 package com.ticket.catedrapoo2.beans;
 
-import java.awt.geom.Area;
+import com.ticket.catedrapoo2.models.Area;
+
 import java.sql.*;
 import java.util.HashMap;
 
@@ -14,7 +15,6 @@ public class AreaBean {
     private int id_dev_boss;
     private String dev_boss_name;
     private Timestamp created_at;
-    // private static HashMap<Integer, Area> all_areas;
 
     // Constructores ===========================================================
     public AreaBean(int id, String prefix_code, String name, String boss_name, String dev_boss_name, Timestamp created_at) {
@@ -33,9 +33,6 @@ public class AreaBean {
         this.id_dev_boss = id_dev_boss;
     }
 
-    // Métodos propios del BEAN ================================================
-
-
     // Getters =================================================================
     public int getId() { return id; }
 
@@ -52,5 +49,4 @@ public class AreaBean {
     public String getDev_boss_name() { return dev_boss_name; }
 
     public int getId_dev_boss() { return id_dev_boss; }
-
 }

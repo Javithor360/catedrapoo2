@@ -15,12 +15,16 @@
                 // Condición que determina que elementos adicionales
                 // se utilizarán en el navbar, dependiendo del tipo
                 // de usuario que haya iniciado sesión.
-                if (user.getRole_id() == 1) {
+                if (user.getRole_id() == 0) {
             %>
-            <a class="nav-link" href="supervise.jsp">Supervisar</a>
+            <a class="nav-link" href="areas.jsp?action=index">Areas</a>
             <%
                 // Agregar los demás tipos de usuario con un else
                 // aquí si hace falta
+            } else if (user.getRole_id() == 1) {
+            %>
+            <a class="nav-link" href="supervise.jsp">Supervisar</a>
+            <%
                 }
             %>
         </div>

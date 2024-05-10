@@ -1,17 +1,16 @@
 package com.ticket.catedrapoo2.controllers;
 
 import com.ticket.catedrapoo2.beans.AreaBean;
-import com.ticket.catedrapoo2.beans.UserSession;
 import com.ticket.catedrapoo2.beans.Users;
 import com.ticket.catedrapoo2.models.AdminUsers;
 import com.ticket.catedrapoo2.models.Area;
+import com.ticket.catedrapoo2.models.Grupo;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,13 +19,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 
 @WebServlet(name = "AdminController", value = "/adminController")
 public class AdminController extends HttpServlet {
 
     // Instancia al Modelo
     Area area = new Area();
+    Grupo grupo = new Grupo();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -60,7 +59,7 @@ public class AdminController extends HttpServlet {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             String createdString = dateFormat.format(created);
 
-            Users user = new Users(name,email,password,gender,birthday,rol,created);
+            Users user = new Users(name, email, password, gender, birthday, rol, created);
 
             AdminUsers operaciones = new AdminUsers();
             boolean resultado = operaciones.agregarUsuario(user);
@@ -73,7 +72,7 @@ public class AdminController extends HttpServlet {
 
             response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
 
-        }else if ("eliminar".equals(operacion)){
+        } else if ("eliminar".equals(operacion)) {
             int id = Integer.parseInt(request.getParameter("id"));
 
             AdminUsers operaciones = new AdminUsers();
@@ -88,7 +87,7 @@ public class AdminController extends HttpServlet {
 
             response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
 
-        }else if ("modificarEmpleado".equals(operacion)){
+        } else if ("modificarEmpleado".equals(operacion)) {
             int id = Integer.parseInt(request.getParameter("id"));
             String name = request.getParameter("name");
             String email = request.getParameter("email");
@@ -105,7 +104,7 @@ public class AdminController extends HttpServlet {
             String gender = request.getParameter("gender");
             String rol = request.getParameter("rol");
 
-            Users user = new Users(id, name, email,gender, birthday,rol);
+            Users user = new Users(id, name, email, gender, birthday, rol);
 
             AdminUsers operaciones = new AdminUsers();
 
@@ -121,43 +120,91 @@ public class AdminController extends HttpServlet {
         }
     }
 
-    private void processRequest(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+    private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            // Corroborando si se envió una acción
-            if(request.getParameter("action") == null) {
-                return;
-            }
 
-            HttpSession currentSession = request.getSession(false);
-            UserSession user = (UserSession) currentSession.getAttribute("user");
+        // Corroborando si se envió una acción y el modelo a utilizar
+        String model = request.getParameter("model");
+        String action = request.getParameter("action");
 
-            // Capturando el valor de la acción
-            String action = request.getParameter("action");
+        if (model == null || action == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Modelo o acción no especificados");
+            return;
+        }
 
-            // En base a la acción se ejecuta un método u otro
-            switch (action) {
-                case "display_new_tickets":
-                    //displayNewTickets(request, response, user.getId());
-                    break;
-                case "display_all_tickets":
-                    //displayAllTickets(request, response, user.getId());
-                    break;
-                case "accept_ticket":
-                    //acceptTicket(request, response, user.getId());
-                    break;
-                case "deny_ticket":
-                    //denyTicket(request, response, user.getId());
-                    break;
-            }
-        } catch (Exception e) {
+        switch (model) {
+            case "area":
+                handleAreaActions(request, response, action);
+                break;
+            case "grupo":
+                handleGrupoActions(request, response, action);
+                break;
+        }
+    }
+
+    private void handleAreaActions(final HttpServletRequest request, final HttpServletResponse response, final String action)
+            throws ServletException, IOException {
+        switch (action) {
+            case "display":
+                displayAreas(request, response);
+                break;
+            case "create":
+                // createArea(request, response);
+                break;
+            case "update":
+                // updateArea(request, response);
+                break;
+            case "delete":
+                // deleteArea(request, response);
+                break;
+            default:
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no válida");
+        }
+    }
+
+    private void handleGrupoActions(final HttpServletRequest request, final HttpServletResponse response, final String action)
+            throws ServletException, IOException {
+        switch (action) {
+            case "display":
+                displayGrupos(request, response);
+                break;
+            case "create":
+                // createGrupo(request, response);
+                break;
+            case "update":
+                // updateGrupo(request, response);
+                break;
+            case "delete":
+                // deleteGrupo(request, response);
+                break;
+            default:
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no válida");
+        }
+    }
+
+
+    // Acciones de Áreas ==========================================================================================
+
+    private void displayAreas(final HttpServletRequest request, final HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            request.setAttribute("areas", area.getAllAreas());
+            request.getRequestDispatcher("/admin/areas.jsp").forward(request, response);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    // Obtener todas las areas funcionales
-    public HashMap<String, AreaBean> fetchAreas() {
-        return new HashMap<String, AreaBean>();
+    // Acciones de Grupos ==========================================================================================
+    private void displayGrupos(final HttpServletRequest request, final HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            request.setAttribute("grupos", grupo.getAllGrupos());
+            request.getRequestDispatcher("/admin/grupos.jsp").forward(request, response);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

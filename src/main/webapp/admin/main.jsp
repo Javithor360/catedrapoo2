@@ -55,7 +55,7 @@
                 <a href="../admin/menuEmpleado.jsp">Nuevo Empleado</a>
             </li>
             <li class="list-group-item text-center">
-                <a href="areas.jsp?action=index">Gestión de Áreas Funcionales</a>
+                <a href="../adminController?action=index">Gestión de Áreas Funcionales</a>
             </li>
             <li class="list-group-item text-center">
                 <a href="grupos.jsp?action=index">Distribución de Grupos</a>

@@ -1,4 +1,7 @@
-<%--
+<%@ page import="com.ticket.catedrapoo2.beans.UserSession" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="com.ticket.catedrapoo2.beans.AreaBean" %>
+<%@ page import="com.ticket.catedrapoo2.models.Area" %><%--
   Created by IntelliJ IDEA.
   User: oscar
   Date: 03/05/2024
@@ -9,11 +12,20 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     // Validar si el usuario tiene permisos para acceder a esta página
+    HttpSession currentSesion = request.getSession(false);
+    UserSession user = (UserSession) currentSesion.getAttribute("user");
+
+    if (user == null || user.getRole_id() != 0) {
+        response.sendRedirect("login.jsp");
+    }
 
     // Mandar a llamar el controlador con petición Get
+    String actionParam = request.getParameter("action");
 
-    // Recibir la respuesta del controlador
-    
+    if (actionParam == null || !actionParam.equals("index")) {
+        request.getRequestDispatcher("/admin/areas?action=index").forward(request, response);
+        return;
+    }
 %>
 <html lang="es">
 <head>
@@ -40,21 +52,38 @@
         </thead>
         <tbody>
         <%
-            // Recorrer las áreas funcionales
+            HashMap<Integer, AreaBean> areas = (HashMap<Integer, AreaBean>) request.getAttribute("areas");
 
+            System.out.println(request.getAttribute("areas"));
+
+            if (areas.size() > 0 && !areas.isEmpty()) {
+                for (AreaBean area : areas.values()) {
         %>
         <tr>
-            <td>FIN</td>
-            <td>Finanzas</td>
-            <td>María Alcano</td>
-            <td>José Aguilar</td>
+            <td>
+                <%= area.getPrefix_code() %>
+            </td>
+            <td>
+                <%= area.getName() %>
+            </td>
+            <td>
+                <%= area.getBoss_name() %>
+            </td>
+            <td>
+                <%= area.getDev_boss_name() %>
+            </td>
         </tr>
+        <%
+            }
+
+        } else {
+        %>
         <tr>
-            <td>CMC</td>
-            <td>Comunicaciones</td>
-            <td>Jotaro Gutierrez</td>
-            <td>Rodrigo Carrasco</td>
+            <td colspan="4">Sin Areas Disponibles</td>
         </tr>
+        <%
+            }
+        %>
         </tbody>
     </table>
 

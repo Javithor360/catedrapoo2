@@ -11,10 +11,10 @@
       </option>
       <option name="myCustomValuesEnabled" value="true" />
     </inspection_tool>
-    <inspection_tool class="IncorrectHttpHeaderInspection" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="customHeaders">
+    <inspection_tool class="SizeReplaceableByIsEmpty" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredTypes">
         <set>
-          <option value="ticket" />
+          <option value="java.util.HashMap" />
         </set>
       </option>
     </inspection_tool>
