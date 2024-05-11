@@ -1,6 +1,11 @@
 package com.ticket.catedrapoo2.beans;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Users {
     private int id;
@@ -17,6 +22,43 @@ public class Users {
     public Users() {
     }
 
+    // Para listar según rol ===================================
+    public Users(int id, String name, String role_id) {
+        this.id = id;
+        this.name = name;
+        this.role_id = role_id;
+    }
+
+    public static List<Users> listarUsuariosPorRol(String role_id) throws SQLException {
+        List<Users> usuarios = new ArrayList<>();
+        Conexion conexion = new Conexion();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT id, name, role_id FROM users WHERE role_id = ? AND id NOT IN (SELECT boss_id FROM assignments_map)";
+            stmt = conexion.getConnection().prepareStatement(query);
+            stmt.setString(1, role_id);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Users usuario = new Users(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("role_id")
+                );
+
+                usuarios.add(usuario);
+            }
+
+        } finally {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            conexion.closeConnection();
+        }
+
+        return usuarios;
+    }
 
     //para guardar valores sin id
     public Users(String name, String email, String password, String gender, Date birthday, String role_id, Date created_at) {
@@ -41,7 +83,6 @@ public class Users {
         this.created_at = created_at;
     }
 
-
     //ocupo para listar una parte de todo el registro
     public Users(int id, String name, String email, String gender, String role_id, Date created_at) {
         this.id = id;
@@ -52,7 +93,7 @@ public class Users {
         this.created_at = created_at;
     }
 
-    public Users (int id, String name, String email, String gender, Date birthday, String role_id ){
+    public Users(int id, String name, String email, String gender, Date birthday, String role_id) {
         this.id = id;
         this.name = name;
         this.email = email;

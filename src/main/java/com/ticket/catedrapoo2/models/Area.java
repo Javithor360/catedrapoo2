@@ -11,10 +11,26 @@ import java.sql.PreparedStatement;
 
 public class Area {
     // Métodos propios del MODELO  ================================================
-    public boolean agregarArea() {
-        String query = "INSERT INTO areas (name, prefix_code, boss_id, dev_boss_id) VALUES (?, ?, ?, ?)";
+    public void addArea(AreaBean newArea) throws SQLException {
+        Conexion conexion = new Conexion();
+        PreparedStatement stmt = null;
 
-        return true;
+        try {
+            String query = "INSERT INTO areas (name, prefix_code, boss_id, dev_boss_id) VALUES (?, ?, ?, ?)";
+            stmt.setString(1, newArea.getName());
+            stmt.setString(2, newArea.getPrefix_code());
+            stmt.setInt(3, newArea.getId_boss());
+            stmt.setInt(4, newArea.getId_dev_boss());
+
+            // Ejecutar la sentencia
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if (stmt != null) stmt.close();
+            conexion.closeConnection();
+        }
     }
 
     public HashMap<Integer, AreaBean> getAllAreas() throws SQLException {

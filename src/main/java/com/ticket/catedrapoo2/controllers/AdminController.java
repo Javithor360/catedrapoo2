@@ -1,5 +1,6 @@
 package com.ticket.catedrapoo2.controllers;
 
+import com.ticket.catedrapoo2.beans.AreaBean;
 import com.ticket.catedrapoo2.beans.UserGroupBean;
 import com.ticket.catedrapoo2.beans.Users;
 import com.ticket.catedrapoo2.models.AdminUsers;
@@ -106,7 +107,8 @@ public class AdminController extends HttpServlet {
                 String genderModificar = request.getParameter("gender");
                 String rolModificar = request.getParameter("rol");
 
-                Users userModificar = new Users(idModificar, nameModificar, emailModificar, genderModificar, birthdayModificar, rolModificar);
+                Users userModificar = new Users(idModificar, nameModificar, emailModificar, genderModificar,
+                        birthdayModificar, rolModificar);
                 AdminUsers operacionesModificar = new AdminUsers();
 
                 boolean resModificar = operacionesModificar.actualizarEmpleado(userModificar);
@@ -120,13 +122,16 @@ public class AdminController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
                 break;
 
+                // Acciones de Areas ==================================================================================
+            case "crearAreaFuncional":
+                addArea(request, response);
+                break;
+
             default:
                 // Manejar la posibilidad de que no se pase una operación válida
                 response.sendRedirect("errorPage.jsp");
                 break;
         }
-
-
     }
 
     private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
@@ -204,6 +209,26 @@ public class AdminController extends HttpServlet {
             request.setAttribute("areas", area.getAllAreas());
             request.getRequestDispatcher("/admin/areas.jsp").forward(request, response);
         } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void addArea(final HttpServletRequest request, final HttpServletResponse response) {
+        // Obtener los datos del formulario enviado en la petición
+        String name = request.getParameter("nombre");
+        String prefix_code = request.getParameter("prefijo");
+        int id_boss = Integer.parseInt(request.getParameter("jefeArea"));
+        int id_dev_boss = Integer.parseInt(request.getParameter("jefeDesarrollo"));
+
+        // Crear un nuevo objeto de Área con los datos obtenidos
+        AreaBean newArea = new AreaBean(name, prefix_code, id_boss, id_dev_boss);
+
+        try {
+            // Se envía el nuevo objeto al modelo para ser insertado en la base de datos
+            area.addArea(newArea);
+            // Se redirige a la ruta del Controlador de Áreas, con su respectivo mensaje
+            response.sendRedirect(request.getContextPath() + "/adminController?model=area&action=index");
+        } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
     }

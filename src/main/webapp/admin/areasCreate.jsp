@@ -1,4 +1,6 @@
-<%--
+<%@ page import="com.ticket.catedrapoo2.beans.Users" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.sql.SQLException" %><%--
   Created by IntelliJ IDEA.
   User: oscar
   Date: 5/10/2024
@@ -39,6 +41,7 @@
     <div class="text-center mb-2">Administra y visualiza el mapeo de integrantes de los distintos grupos de las Áreas
         Funcionales.
     </div>
+
     <form action="../adminController" method="POST">
         <input type="hidden" name="action" value="crearAreaFuncional">
         <div class="row">
@@ -55,32 +58,58 @@
             <div class="col-md-6 mb-3">
                 <label for="jefeArea" class="form-label">Jefe de Área:</label>
                 <select class="form-select" id="jefeArea" name="jefeArea">
-                    <option selected>Sin jefes de área disponibles</option>
+                    <option selected disabled>-- Seleccione un Jefe de Área --</option>
+                    <%
+                        List<Users> jefesArea = null;
+                        try {
+                            jefesArea = Users.listarUsuariosPorRol("3");
+                            for (Users jefeArea : jefesArea) {
+                    %>
+                    <option value="<%= jefeArea.getId() %>"><%= jefeArea.getName() %></option>
+                    <%
+                            }
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                        }
+                    %>
                 </select>
             </div>
             <div class="col-md-6 mb-3">
                 <label for="jefeDesarrollo" class="form-label">Jefe de Desarrollo:</label>
                 <select class="form-select" id="jefeDesarrollo" name="jefeDesarrollo">
-                    <option selected>Sin jefes de desarrollo disponibles</option>
+                    <option selected disabled>-- Seleccione un Jefe de Desarrollo --</option>
+                    <%
+                        List<Users> jefesDesarrollo = null;
+                        try {
+                            jefesDesarrollo = Users.listarUsuariosPorRol("1");
+                            for (Users jefeDev : jefesDesarrollo) {
+                    %>
+                    <option value="<%= jefeDev.getId() %>"><%= jefeDev.getName() %></option>
+                    <%
+                            }
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                        }
+                    %>
                 </select>
             </div>
         </div>
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label for="numGrupoEmpleados" class="form-label">Número de Grupo Empleados:</label>
+                <label for="numGrupoEmpleados" class="form-label">ID Grupo Empleados:</label>
                 <input type="number" class="form-control" id="numGrupoEmpleados"
                        step="0" name="numGrupoEmpleados"  disabled value="5">
             </div>
             <div class="col-md-6 mb-3">
-                <label for="numGrupoProgramadores" class="form-label">Número de Grupo Programadores:</label>
+                <label for="numGrupoProgramadores" class="form-label">ID Grupo Programadores:</label>
                 <input type="number" class="form-control" id="numGrupoProgramadores"
                        step="0" disabled name="numGrupoProgramadores" value="6">
             </div>
         </div>
 
-        <div class="">
+        <div>
             <a href="/admin/main.jsp" class="btn btn-secondary">Volver</a>
-            <button type="submit" class="btn btn-primary">Crear</button>
+            <button type="submit" class="btn btn-primary" disabled>Crear</button>
         </div>
     </form>
 </main>
