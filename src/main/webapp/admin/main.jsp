@@ -55,10 +55,10 @@
                 <a href="../admin/menuEmpleado.jsp">Nuevo Empleado</a>
             </li>
             <li class="list-group-item text-center">
-                <a href="../adminController?model=area&action=index">Gestión de Áreas Funcionales</a>
+                <a href="/admin/areas.jsp">Gestión de Áreas Funcionales</a>
             </li>
             <li class="list-group-item text-center">
-                <a href="../adminController?model=usergroup&action=index">Distribución de Grupos</a>
+                <a href="/admin/grupos.jsp">Distribución de Grupos</a>
             </li>
         </ul>
     </div>

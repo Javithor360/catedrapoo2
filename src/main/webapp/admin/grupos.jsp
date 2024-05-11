@@ -15,12 +15,13 @@
 
     if (user == null || user.getRole_id() != 0) {
         response.sendRedirect("login.jsp");
+        return;
     }
 
     String actionParam = request.getParameter("action");
 
     if (actionParam == null || !actionParam.equals("index")) {
-        request.getRequestDispatcher("/admin/groups.jsp").forward(request, response);
+        request.getRequestDispatcher("/adminController?model=usergroup&action=index").forward(request, response);
         return;
     }
 
@@ -74,7 +75,7 @@
                 <%= grupo.getName_boss() %>
             </td>
             <td>
-                <a href="groups.jsp?action=edit&id=<%= grupo.getId() %>" class="btn btn-primary">Editar</a>
+                <a href="grupos.jsp?action=edit&id=<%= grupo.getId() %>" class="btn btn-primary">Editar</a>
                 <%--<a href="groups.jsp?action=delete&id=<%= grupo.getId() %>" class="btn btn-danger">Eliminar</a>--%>
             </td>
         </tr>

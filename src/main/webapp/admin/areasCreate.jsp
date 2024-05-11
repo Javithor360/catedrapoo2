@@ -1,6 +1,9 @@
 <%@ page import="com.ticket.catedrapoo2.beans.Users" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.sql.SQLException" %><%--
+<%@ page import="java.sql.SQLException" %>
+<%@ page import="com.ticket.catedrapoo2.models.Area" %>
+<%@ page import="com.ticket.catedrapoo2.beans.UserSession" %>
+<%@ page import="com.ticket.catedrapoo2.models.Grupo" %><%--
   Created by IntelliJ IDEA.
   User: oscar
   Date: 5/10/2024
@@ -8,6 +11,17 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    // Válidar si el usuario tiene permisos para acceder a la página
+    HttpSession currentSession = request.getSession(false);
+    UserSession user = (UserSession) currentSession.getAttribute("user");
+
+    if (user == null || user.getRole_id() != 0) {
+        response.sendRedirect("/login.jsp");
+        return;
+    }
+%>
+
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,8 +56,8 @@
         Funcionales.
     </div>
 
-    <form action="../adminController" method="POST">
-        <input type="hidden" name="action" value="crearAreaFuncional">
+    <form action="../adminController" method="POST" id="createArea">
+        <input type="hidden" name="operacion" value="crearAreaFuncional">
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="nombre" class="form-label">Nombre:</label>
@@ -58,14 +72,18 @@
             <div class="col-md-6 mb-3">
                 <label for="jefeArea" class="form-label">Jefe de Área:</label>
                 <select class="form-select" id="jefeArea" name="jefeArea">
-                    <option selected disabled>-- Seleccione un Jefe de Área --</option>
+                    <option selected disabled value="0">-- Seleccione un Jefe de Área --</option>
                     <%
                         List<Users> jefesArea = null;
+                        int numGrupoEmpleados = (Grupo.countGrupos() + 1);
+                        int numGrupoDev = (Grupo.countGrupos() + 2);
+
                         try {
                             jefesArea = Users.listarUsuariosPorRol("3");
                             for (Users jefeArea : jefesArea) {
                     %>
-                    <option value="<%= jefeArea.getId() %>"><%= jefeArea.getName() %></option>
+                    <option value="<%= jefeArea.getId() %>"><%= jefeArea.getName() %>
+                    </option>
                     <%
                             }
                         } catch (SQLException throwables) {
@@ -77,14 +95,15 @@
             <div class="col-md-6 mb-3">
                 <label for="jefeDesarrollo" class="form-label">Jefe de Desarrollo:</label>
                 <select class="form-select" id="jefeDesarrollo" name="jefeDesarrollo">
-                    <option selected disabled>-- Seleccione un Jefe de Desarrollo --</option>
+                    <option selected disabled value="0">-- Seleccione un Jefe de Desarrollo --</option>
                     <%
                         List<Users> jefesDesarrollo = null;
                         try {
                             jefesDesarrollo = Users.listarUsuariosPorRol("1");
                             for (Users jefeDev : jefesDesarrollo) {
                     %>
-                    <option value="<%= jefeDev.getId() %>"><%= jefeDev.getName() %></option>
+                    <option value="<%= jefeDev.getId() %>"><%= jefeDev.getName() %>
+                    </option>
                     <%
                             }
                         } catch (SQLException throwables) {
@@ -98,12 +117,12 @@
             <div class="col-md-6 mb-3">
                 <label for="numGrupoEmpleados" class="form-label">ID Grupo Empleados:</label>
                 <input type="number" class="form-control" id="numGrupoEmpleados"
-                       step="0" name="numGrupoEmpleados"  disabled value="5">
+                       step="0" name="numGrupoEmpleados" disabled value="<%= numGrupoEmpleados%>">
             </div>
             <div class="col-md-6 mb-3">
                 <label for="numGrupoProgramadores" class="form-label">ID Grupo Programadores:</label>
                 <input type="number" class="form-control" id="numGrupoProgramadores"
-                       step="0" disabled name="numGrupoProgramadores" value="6">
+                       step="0" name="numGrupoProgramadores" disabled value="<%= numGrupoDev%>">
             </div>
         </div>
 
@@ -113,5 +132,68 @@
         </div>
     </form>
 </main>
+<script>
+    (() => {
+        const form = document.querySelector('#createArea');
+        const inputs = form.querySelectorAll('input, select');
+        const inputPrefix = form.querySelector('#prefijo');
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        // Función para validar campos generales
+        function validateForm() {
+            let camposCompletos = true;
+            inputs.forEach(input => {
+                if (input.value.trim() === '' && !input.disabled) {
+                    camposCompletos = false;
+                }
+            });
+
+            // Validar que los select tengan un value diferente de 0
+            const selects = form.querySelectorAll('select');
+            selects.forEach(select => {
+                if (select.value === '0') {
+                    camposCompletos = false;
+                }
+            });
+
+            submitButton.disabled = !camposCompletos || !validarPrefijo();
+        }
+
+        // Función para validar el prefijo con retorno de estado
+        function validarPrefijo() {
+            const regex = /^[a-zA-Z]{3}$/;
+            if (!regex.test(inputPrefix.value)) {
+                inputPrefix.setCustomValidity('El prefijo debe tener 3 letras.');
+                inputPrefix.reportValidity();
+                return false;
+            } else {
+                inputPrefix.setCustomValidity('');
+                return true;
+            }
+        }
+
+        // Añadir listeners para cada campo para validar en tiempo real
+        inputs.forEach(input => {
+            if (['select', 'text', 'email'].includes(input.tagName.toLowerCase()) || input.type === 'text' || input.type === 'email') {
+                input.addEventListener('input', validateForm);
+            }
+        });
+
+        // Añadir listener específico para la validación del prefijo
+        inputPrefix.addEventListener('input', () => {
+            validarPrefijo();
+            validateForm();
+        });
+
+        // Añadir listener al formulario para validar antes del envío
+        form.addEventListener('submit', function(event) {
+            if (submitButton.disabled) {
+                event.preventDefault(); // Detener el envío si hay algún problema
+                alert('Por favor, completa todos los campos correctamente antes de enviar.');
+            }
+        });
+    })();
+
+</script>
 </body>
 </html>

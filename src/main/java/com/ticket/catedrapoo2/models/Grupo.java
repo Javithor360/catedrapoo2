@@ -3,6 +3,7 @@ package com.ticket.catedrapoo2.models;
 import com.ticket.catedrapoo2.beans.Conexion;
 import com.ticket.catedrapoo2.beans.GrupoBean;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -29,5 +30,31 @@ public class Grupo {
         conexion.closeConnection();
 
         return grupoList;
+    }
+
+    public static Integer countGrupos() throws SQLException {
+        Integer numGrupos = 0;
+        Conexion conexion = new Conexion();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT COUNT(*) AS total FROM `groups`";
+            stmt = conexion.getConnection().prepareStatement(query);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                numGrupos = rs.getInt("total");
+                System.out.println("Número de grupos: " + numGrupos);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if (rs != null) rs.close();
+            conexion.closeConnection();
+        }
+
+        return numGrupos;
     }
 }

@@ -19,14 +19,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-@WebServlet(name = "AdminController", value = "/adminController")
+@WebServlet(name = "AdminController", urlPatterns = {"/adminController"})
 public class AdminController extends HttpServlet {
 
     // Instancia al Modelo
     Area area = new Area();
     Mapeo map = new Mapeo();
-//    UserGroupBean = new UserGroups();
-    // Grupo grupo = new Grupo();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -40,6 +38,8 @@ public class AdminController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String operacion = request.getParameter("operacion");
+
+        System.out.println("Operación: " + operacion);
 
         switch (operacion) {
             case "nuevoEmpleado":

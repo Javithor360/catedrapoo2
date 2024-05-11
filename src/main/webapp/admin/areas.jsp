@@ -17,12 +17,13 @@
 
     if (user == null || user.getRole_id() != 0) {
         response.sendRedirect("login.jsp");
+        return;
     }
 
     String actionParam = request.getParameter("action");
 
     if (actionParam == null || !actionParam.equals("index")) {
-        request.getRequestDispatcher("/admin/areas?action=index").forward(request, response);
+        request.getRequestDispatcher("/adminController?model=area&action=index").forward(request, response);
         return;
     }
 %>
