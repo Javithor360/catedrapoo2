@@ -3,9 +3,7 @@ package com.ticket.catedrapoo2.controllers;
 import com.ticket.catedrapoo2.beans.AreaBean;
 import com.ticket.catedrapoo2.beans.UserGroupBean;
 import com.ticket.catedrapoo2.beans.Users;
-import com.ticket.catedrapoo2.models.AdminUsers;
-import com.ticket.catedrapoo2.models.Area;
-import com.ticket.catedrapoo2.models.Mapeo;
+import com.ticket.catedrapoo2.models.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -25,6 +23,8 @@ public class AdminController extends HttpServlet {
     // Instancia al Modelo
     Area area = new Area();
     Mapeo map = new Mapeo();
+    UserGroup userGroup = new UserGroup();
+    Grupo grupo = new Grupo();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -122,9 +122,17 @@ public class AdminController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
                 break;
 
-                // Acciones de Areas ==================================================================================
+            // Acciones de Areas ==================================================================================
             case "crearAreaFuncional":
                 addArea(request, response);
+                break;
+
+            case "addToGroup":
+                addUserToGroup(request, response);
+                break;
+
+            case "deleteFromGroup":
+                deleteUserFromGroup(request, response);
                 break;
 
             default:
@@ -188,7 +196,7 @@ public class AdminController extends HttpServlet {
                 // createGrupo(request, response);
                 break;
             case "update":
-                // updateGrupo(request, response);
+                updateDetailsUsersGroup(request, response);
                 break;
             case "delete":
                 // deleteGrupo(request, response);
@@ -199,7 +207,6 @@ public class AdminController extends HttpServlet {
 
         }
     }
-
 
     // Acciones de Áreas ==========================================================================================
 
@@ -244,7 +251,67 @@ public class AdminController extends HttpServlet {
         } catch (ServletException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    private void updateDetailsUsersGroup(final HttpServletRequest request, final HttpServletResponse response) throws SQLException {
+
+        // Obtener el ID del grupo a modificar
+        int id = Integer.parseInt(request.getParameter("id"));
+
+        System.out.println("ID del grupo: " + id);
+
+        try {
+            // Verificar si el grupo existe
+            if (grupo.getGrupoById(id) == null) {
+                response.sendRedirect(request.getContextPath() + "/grupos.jsp");
+                return;
+            }
+
+            request.setAttribute("grupo", grupo.getGrupoById(id));
+            request.setAttribute("usuarios", userGroup.getUserFromGroup(id));
+
+            // request.setAttribute("usuarios", map.getUsersFrom());
+            request.getRequestDispatcher("/admin/gruposUpdate.jsp").forward(request, response);
+        } catch (ServletException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void addUserToGroup(final HttpServletRequest request, final HttpServletResponse response) {
+        // Obtener los datos del formulario enviado en la petición
+        int id_user = Integer.parseInt(request.getParameter("id_user"));
+        int id_group = Integer.parseInt(request.getParameter("id_group"));
+
+        // Crear un nuevo objeto de Mapeo con los datos obtenidos
+//        UserGroupBean newUserGroup = new UserGroupBean(id_user, id_group);
+//
+//        try {
+//            // Se envía el nuevo objeto al modelo para ser insertado en la base de datos
+//            map.addUserToGroup(newUserGroup);
+//            // Se redirige a la ruta del Controlador de Grupos, con su respectivo mensaje
+//            response.sendRedirect(request.getContextPath() + "/adminController?model=usergroup&action=index");
+//        } catch (IOException | SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+    }
+
+    private void deleteUserFromGroup(final HttpServletRequest request, final HttpServletResponse response) {
+        // Obtener los datos del formulario enviado en la petición
+        int id_user = Integer.parseInt(request.getParameter("id_user"));
+        int id_group = Integer.parseInt(request.getParameter("id_group"));
+
+        // Crear un nuevo objeto de Mapeo con los datos obtenidos
+//        UserGroupBean userGroup = new UserGroupBean(id_user, id_group);
+//
+//        try {
+//            // Se envía el nuevo objeto al modelo para ser insertado en la base de datos
+//            map.deleteUserFromGroup(userGroup);
+//            // Se redirige a la ruta del Controlador de Grupos, con su respectivo mensaje
+//            response.sendRedirect(request.getContextPath() + "/adminController?model=usergroup&action=index");
+//        } catch (IOException | SQLException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
 }

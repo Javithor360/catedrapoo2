@@ -75,8 +75,7 @@
                 <%= grupo.getName_boss() %>
             </td>
             <td>
-                <a href="grupos.jsp?action=edit&id=<%= grupo.getId() %>" class="btn btn-primary">Editar</a>
-                <%--<a href="groups.jsp?action=delete&id=<%= grupo.getId() %>" class="btn btn-danger">Eliminar</a>--%>
+                <a href="gruposUpdate.jsp?id=<%= grupo.getId() %>" class="btn btn-primary">Editar</a>
             </td>
         </tr>
         <%

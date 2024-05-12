@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 public class Grupo {
-
     public HashMap<Integer, GrupoBean> getAllGrupos() throws SQLException {
         HashMap<Integer, GrupoBean> grupoList = new HashMap<>();
 
@@ -30,6 +29,37 @@ public class Grupo {
         conexion.closeConnection();
 
         return grupoList;
+    }
+
+    public GrupoBean getGrupoById(Integer id) throws SQLException {
+        GrupoBean grupo = null;
+        Conexion conexion = new Conexion();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT * FROM `groups` WHERE id = ?";
+            stmt = conexion.getConnection().prepareStatement(query);
+            stmt.setInt(1, id);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                grupo = new GrupoBean(
+                        rs.getInt("id"),
+                        rs.getString("name")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if (rs != null) rs.close();
+            conexion.closeConnection();
+        }
+
+        System.out.println("Grupo: " + grupo.getName());
+
+        return grupo;
     }
 
     public static Integer countGrupos() throws SQLException {
