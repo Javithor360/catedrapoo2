@@ -49,8 +49,8 @@
             <th>Área</th>
             <th>Nombre Grupo</th>
             <th>Jefe</th>
-            <th>Acción</th>
             <th>Empleados/Programadores</th>
+            <th>Acción</th>
         </tr>
         </thead>
         <tbody>
