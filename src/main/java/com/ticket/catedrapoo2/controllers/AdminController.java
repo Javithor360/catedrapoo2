@@ -1,6 +1,7 @@
 package com.ticket.catedrapoo2.controllers;
 
 import com.ticket.catedrapoo2.beans.AreaBean;
+import com.ticket.catedrapoo2.beans.GrupoBean;
 import com.ticket.catedrapoo2.beans.UserGroupBean;
 import com.ticket.catedrapoo2.beans.Users;
 import com.ticket.catedrapoo2.models.*;
@@ -9,7 +10,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -36,7 +39,75 @@ public class AdminController extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Determinar el tipo de contenido de la petición
+        String contentType = request.getContentType();
+
+        if (contentType != null && contentType.contains("application/json")) {
+            handleJsonRequest(request, response);
+        } else {
+            handleFormRequest(request, response);
+        }
+    }
+
+    private void handleJsonRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        StringBuilder jsonBuffer = new StringBuilder();
+        String line;
+        try (BufferedReader reader = request.getReader()) {
+            while ((line = reader.readLine()) != null) {
+                jsonBuffer.append(line);
+            }
+        }
+
+        JSONObject jsonObj = new JSONObject(jsonBuffer.toString());
+        String action = jsonObj.getString("action");
+        int userId = jsonObj.getInt("userId");
+        int groupId = jsonObj.getInt("groupId");
+
+        try {
+            switch (action) {
+                case "addToGroup":
+                    addUserToGroup(userId, groupId, response);
+                    break;
+                case "deleteFromGroup":
+                    deleteUserFromGroup(userId, groupId, response);
+                    break;
+                default:
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("{\"error\": \"Operación no válida\"}");
+                    break;
+            }
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\": \"Error de base de datos: " + e.getMessage() + "\"}");
+        }
+    }
+
+    private void addUserToGroup(int userId, int groupId, HttpServletResponse response) throws SQLException, IOException {
+        // Aquí va la lógica para añadir el usuario al grupo
+        // Suponemos que retorna un boolean
+        boolean result = userGroup.addUserToGroup(new UserGroupBean(groupId, userId));
+        response.setContentType("application/json");
+        if (result) {
+            response.getWriter().write("{\"success\": true, \"message\": \"Usuario añadido al grupo correctamente.\"}");
+        } else {
+            response.getWriter().write("{\"success\": false, \"message\": \"No se pudo añadir el usuario al grupo.\"}");
+        }
+    }
+
+    private void deleteUserFromGroup(int userId, int groupId, HttpServletResponse response) throws SQLException, IOException {
+        // Aquí va la lógica para eliminar el usuario del grupo
+        boolean result = userGroup.deleteUserFromGroup(new UserGroupBean(groupId, userId));
+        response.setContentType("application/json");
+        if (result) {
+            response.getWriter().write("{\"success\": true, \"message\": \"Usuario eliminado del grupo correctamente.\"}");
+        } else {
+            response.getWriter().write("{\"success\": false, \"message\": \"No se pudo eliminar el usuario del grupo.\"}");
+        }
+    }
+
+
+    private void handleFormRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String operacion = request.getParameter("operacion");
 
         System.out.println("Operación: " + operacion);
@@ -125,14 +196,6 @@ public class AdminController extends HttpServlet {
             // Acciones de Areas ==================================================================================
             case "crearAreaFuncional":
                 addArea(request, response);
-                break;
-
-            case "addToGroup":
-                addUserToGroup(request, response);
-                break;
-
-            case "deleteFromGroup":
-                deleteUserFromGroup(request, response);
                 break;
 
             default:
@@ -254,64 +317,35 @@ public class AdminController extends HttpServlet {
     }
 
     private void updateDetailsUsersGroup(final HttpServletRequest request, final HttpServletResponse response) throws SQLException {
-
         // Obtener el ID del grupo a modificar
         int id = Integer.parseInt(request.getParameter("id"));
 
-        System.out.println("ID del grupo: " + id);
-
         try {
+
+            GrupoBean grupoObtenido = grupo.getGrupoById(id);
+
             // Verificar si el grupo existe
-            if (grupo.getGrupoById(id) == null) {
+            if (grupoObtenido == null) {
                 response.sendRedirect(request.getContextPath() + "/grupos.jsp");
                 return;
             }
 
-            request.setAttribute("grupo", grupo.getGrupoById(id));
-            request.setAttribute("usuarios", userGroup.getUserFromGroup(id));
+            // Obtener el tipo de grupo
+            String type = grupoObtenido.getName().split(" ")[0];
 
-            // request.setAttribute("usuarios", map.getUsersFrom());
-            request.getRequestDispatcher("/admin/gruposUpdate.jsp").forward(request, response);
+            request.setAttribute("grupo", grupoObtenido);
+            request.setAttribute("miembros", userGroup.getUserFromGroup(id));
+            request.setAttribute("usuarios", userGroup.getUsersWithoutGroup(type));
+
+            for (Users miembro : userGroup.getUserFromGroup(id).values()) {
+                System.out.println("Miembro: " + miembro.getName());
+            }
+
+            request.getRequestDispatcher("/admin/grupo.jsp").forward(request, response);
         } catch (ServletException | IOException e) {
             throw new RuntimeException(e);
         }
 
-    }
-
-    private void addUserToGroup(final HttpServletRequest request, final HttpServletResponse response) {
-        // Obtener los datos del formulario enviado en la petición
-        int id_user = Integer.parseInt(request.getParameter("id_user"));
-        int id_group = Integer.parseInt(request.getParameter("id_group"));
-
-        // Crear un nuevo objeto de Mapeo con los datos obtenidos
-//        UserGroupBean newUserGroup = new UserGroupBean(id_user, id_group);
-//
-//        try {
-//            // Se envía el nuevo objeto al modelo para ser insertado en la base de datos
-//            map.addUserToGroup(newUserGroup);
-//            // Se redirige a la ruta del Controlador de Grupos, con su respectivo mensaje
-//            response.sendRedirect(request.getContextPath() + "/adminController?model=usergroup&action=index");
-//        } catch (IOException | SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-    }
-
-    private void deleteUserFromGroup(final HttpServletRequest request, final HttpServletResponse response) {
-        // Obtener los datos del formulario enviado en la petición
-        int id_user = Integer.parseInt(request.getParameter("id_user"));
-        int id_group = Integer.parseInt(request.getParameter("id_group"));
-
-        // Crear un nuevo objeto de Mapeo con los datos obtenidos
-//        UserGroupBean userGroup = new UserGroupBean(id_user, id_group);
-//
-//        try {
-//            // Se envía el nuevo objeto al modelo para ser insertado en la base de datos
-//            map.deleteUserFromGroup(userGroup);
-//            // Se redirige a la ruta del Controlador de Grupos, con su respectivo mensaje
-//            response.sendRedirect(request.getContextPath() + "/adminController?model=usergroup&action=index");
-//        } catch (IOException | SQLException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 
 }

@@ -75,7 +75,6 @@ public class Grupo {
 
             if (rs.next()) {
                 numGrupos = rs.getInt("total");
-                System.out.println("Número de grupos: " + numGrupos);
             }
         } catch (SQLException e) {
             e.printStackTrace();

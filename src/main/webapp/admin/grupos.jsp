@@ -76,6 +76,7 @@
             </td>
             <td>
                 <a href="gruposUpdate.jsp?id=<%= grupo.getId() %>" class="btn btn-primary">Editar</a>
+<%--                <a href="/adminController?model=usergroup&action=update&id=<%= grupo.getId() %>" class="btn btn-primary">Editar</a>--%>
             </td>
         </tr>
         <%

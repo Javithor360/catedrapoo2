@@ -15,6 +15,11 @@ public class UserGroupBean {
         this.user_name = user_name;
     }
 
+    public UserGroupBean(int id, int id_user) {
+        this.id = id;
+        this.id_user = id_user;
+    }
+
     // Getters =================================================================
     public String getGupo_name() { return gupo_name; }
 
