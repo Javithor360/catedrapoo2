@@ -50,6 +50,7 @@
             <th>Nombre Grupo</th>
             <th>Jefe</th>
             <th>Acción</th>
+            <th>Empleados/Programadores</th>
         </tr>
         </thead>
         <tbody>
@@ -73,6 +74,9 @@
             </td>
             <td>
                 <%= grupo.getName_boss() %>
+            </td>
+            <td>
+                <%= grupo.getTotal_users() %>
             </td>
             <td>
                 <a href="gruposUpdate.jsp?id=<%= grupo.getId() %>" class="btn btn-primary">Editar</a>
