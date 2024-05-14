@@ -12,6 +12,7 @@ public class Ticket {
     private String code;
     private String name;
     private String description;
+    private String pdf;
     private int state_id;
     private String state;
     private String observations;
@@ -26,11 +27,12 @@ public class Ticket {
     private String due_date;
     private String created_at;
 
-    public Ticket(int id, String code, String name, String description, String state, String requester_area_name, String boss_name, String dev_boss_name, String created_at) {
+    public Ticket(int id, String code, String name, String description, String pdf,String state, String requester_area_name, String boss_name, String dev_boss_name, String created_at) {
         this.id = id;
         this.code = code;
         this.name = name;
         this.description = description;
+        this.pdf = pdf;
         this.state = state;
         this.requester_area_name = requester_area_name;
         this.boss_name = boss_name;
@@ -38,11 +40,12 @@ public class Ticket {
         this.created_at = created_at;
     }
 
-    public Ticket(int id, String code, String name, String description, String state, int state_id, String observations, String requester_area_name, String boss_name, String dev_boss_name, String tester_name, String programmer_name, String due_date, String created_at) {
+    public Ticket(int id, String code, String name, String description, String pdf, String state, int state_id, String observations, String requester_area_name, String boss_name, String dev_boss_name, String tester_name, String programmer_name, String due_date, String created_at) {
         this.id = id;
         this.code = code;
         this.name = name;
         this.description = description;
+        this.pdf = pdf;
         this.state = state;
         this.state_id = state_id;
         this.observations = observations;
@@ -108,6 +111,8 @@ public class Ticket {
     public String getDescription() {
         return description;
     }
+
+    public String getPdf() {return pdf;}
 
     public String getState() {
         return state;
