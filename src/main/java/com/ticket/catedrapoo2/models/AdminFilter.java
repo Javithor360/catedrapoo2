@@ -23,7 +23,7 @@ public class AdminFilter {
                     "t.code AS ticket_code, " +
                     "t.name AS ticket_name, " +
                     "t.description AS ticket_description, " +
-                    "t.pdf AS ticket_pdf" +
+                    "t.pdf AS ticket_pdf, " +
                     "s.name AS state, " +
                     "t.state_id, " +
                     "o.description AS observations, " +
