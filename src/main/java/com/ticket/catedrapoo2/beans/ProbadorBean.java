@@ -18,6 +18,7 @@ public class ProbadorBean {
                     "t.code AS ticket_code, " +
                     "t.name AS ticket_name, " +
                     "t.description AS ticket_description, " +
+                    "t.pdf AS pdf, " +
                     "t.state_id AS state_id, " +
                     "t.due_date AS ticket_due_date, " +
                     "t.created_at AS ticket_created_at, " +
@@ -49,6 +50,7 @@ public class ProbadorBean {
                         rs.getString("ticket_code"),
                         rs.getString("ticket_name"),
                         rs.getString("ticket_description"),
+                        rs.getString("pdf"),
                         rs.getString("state"),
                         rs.getInt("state_id"),
                         rs.getString("observations"),
@@ -115,6 +117,7 @@ public class ProbadorBean {
                     "t.code AS ticket_code, " +
                     "t.name AS ticket_name, " +
                     "t.description AS ticket_description, " +
+                    "t.pdf AS pdf, " +
                     "t.state_id AS state_id, " +
                     "t.due_date AS ticket_due_date, " +
                     "t.created_at AS ticket_created_at, " +
@@ -144,6 +147,7 @@ public class ProbadorBean {
                         rs.getString("ticket_code"),
                         rs.getString("ticket_name"),
                         rs.getString("ticket_description"),
+                        rs.getString("pdf"),
                         rs.getString("state"),
                         rs.getInt("state_id"),
                         rs.getString("observations"),

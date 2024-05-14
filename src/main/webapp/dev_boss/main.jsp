@@ -113,7 +113,8 @@
                                     description: '<%= ticket.getDescription().replace("\r\n", "\\n") %>',
                                     observations: null,
                                     requester_name: '<%= ticket.getBoss_name() %>',
-                                    requester_area_name: '<%= ticket.getRequester_area_name() %>'
+                                    requester_area_name: '<%= ticket.getRequester_area_name() %>',
+                                    pdf: '<%= ticket.getPdf() %>'
                                 })"
                             >
                                 Ver más
@@ -168,11 +169,15 @@
         </div>
     </div>
 </div>
-
+<%
+    String path = application.getRealPath("/storage/");
+%>
+<input type="hidden" id="storagePath" value="<%= path %>">
 </body>
 
 <script>
     // Función para cargar la información del ticket en el modal recibiendo el Object conteniendo la información de ticket
+    var path = document.getElementById("storagePath").value;
 
     // Sí, al ser Javascript se tiene que construir el contenido del modal con strings...
     function loadTicketInfo(ticket) {
@@ -193,6 +198,15 @@
             "<div class='form-group'>" +
             "<label for='requester_name'><strong>Solicitante:</strong></label>" +
             "<input type='text' id='requester_name' class='form-control' value='" + ticket.requester_name + " (Depto de. " + ticket.requester_area_name + ")' readonly>" +
+            "</div>" +
+            "<div class='form-group'>" +
+            "<label for='pdf_file' class='mr-3'><strong>Archivos de detalles:</strong></label>" +
+            (
+                ticket.pdf !== "null" ?
+                    "<a type='text' id='pdf_file' class='btn btn-primary'  target='_blank' href='/dfc?fileName="+ticket.pdf+"'>Descargar archivo de detalles</a>"
+                    :
+                    "<button type='button' class='btn btn-primary disabled' disabled>Archivo no disponible...</button>"
+            )+
             "</div>" +
             "<div class='form-group'>" +
             "<label for='observations'><strong>Observaciones:</strong></label>" +

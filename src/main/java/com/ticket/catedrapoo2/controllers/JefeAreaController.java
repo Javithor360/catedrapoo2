@@ -105,9 +105,8 @@ public class JefeAreaController extends HttpServlet {
                 // Escribir el archivo en el disco
                 filePart.write(pathToSave);
             }
-            System.out.println("Salimos de todo chavales");
+
             createTicket(user_id, ticket_title, ticket_desc, code, fileName); // Creación de un nuevo ticket
-            System.out.println("Hay ticket chavales");
 
             response.sendRedirect("/requester/main.jsp?info=success_create_ticket"); // Se redirige a la vista principal con un mensaje de éxito si logra guardar el dato
         } catch (SQLException e) {

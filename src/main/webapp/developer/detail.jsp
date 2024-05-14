@@ -1,7 +1,8 @@
 <%@ page import="com.ticket.catedrapoo2.beans.Ticket" %>
 <%@ page import="com.ticket.catedrapoo2.beans.UserSession" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="com.ticket.catedrapoo2.beans.Bitacora" %><%--
+<%@ page import="com.ticket.catedrapoo2.beans.Bitacora" %>
+<%@ page import="java.util.Objects" %><%--
   Created by IntelliJ IDEA.
   User: flore
   Date: 29/4/2024
@@ -74,6 +75,13 @@
         }
     %>
     <h1 class="text-center">Información del ticket</h1>
+    <%
+        if(!Objects.equals(ticket.getPdf(), "null")){
+    %>
+    <a type='text' id='pdf_file' class='btn btn-primary'  target='_blank' href='/dfc?fileName=<%= ticket.getPdf() %>'>Descargar archivo de detalles</a>
+    <%
+        }
+    %>
     <hr class="mb-3"/>
     <form action="#"> <!-- Formulario de información del ticket -->
         <div class="row g-2">

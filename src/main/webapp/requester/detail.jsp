@@ -2,6 +2,7 @@
 <%@ page import="com.ticket.catedrapoo2.beans.UserSession" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="com.ticket.catedrapoo2.beans.Bitacora" %>
+<%@ page import="java.util.Objects" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
@@ -45,6 +46,12 @@
 
     <main class="container mx-auto my-5 w-50">
         <h1 class="text-center">Información del ticket</h1>
+        <%
+            if(!Objects.equals(ticket.getPdf(), "null")){
+        %>
+        <a type='text' id='pdf_file' class='btn btn-primary'  target='_blank' href='/dfc?fileName=<%= ticket.getPdf() %>'>Descargar archivo de detalles</a><%
+            }
+        %>
         <hr class="mb-3"/>
         <form action="#"> <!-- Formulario de información del ticket -->
             <div class="row g-2">
