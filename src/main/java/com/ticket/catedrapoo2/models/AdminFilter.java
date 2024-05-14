@@ -23,6 +23,7 @@ public class AdminFilter {
                     "t.code AS ticket_code, " +
                     "t.name AS ticket_name, " +
                     "t.description AS ticket_description, " +
+                    "t.pdf AS ticket_pdf" +
                     "s.name AS state, " +
                     "t.state_id, " +
                     "o.description AS observations, " +
@@ -58,6 +59,7 @@ public class AdminFilter {
                         rs.getString("ticket_code"),
                         rs.getString("ticket_name"),
                         rs.getString("ticket_description"),
+                        rs.getString("pdf"),
                         rs.getString("state"),
                         rs.getInt("state_id"),
                         rs.getString("observations"),
