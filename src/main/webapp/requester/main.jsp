@@ -155,7 +155,7 @@
         // Funciones para cargar contenido en los modales
         function loadLogForm() { // Cargar formulario de nuevo registro de bitácora que recibe información del ticket en un Object
             document.getElementById("createTicketModalBody").innerHTML = "<p>Completa todos los campos para crear el registro</p>" +
-                "<form onsubmit='return validateForm()' action='/rqc' method='post'>" + // Formulario de nuevo caso donde el evento onsubmit valida los campos y si to.do está correcto, envía la petición al servlet
+                "<form onsubmit='return validateForm()' action='/rqc' method='post' enctype='multipart/form-data'>" + // Formulario de nuevo caso donde el evento onsubmit valida los campos y si to.do está correcto, envía la petición al servlet
                 "<div class='form-group'>" +
                 "<label for='titleTicket'><strong>Título del proyecto:</strong></label>" +
                 "<input type='text' id='titleTicket' name='title' class='form-control'>" +
@@ -163,6 +163,10 @@
                 "<div class='form-group'>" +
                 "<label for='descTicket'><strong>Descripción del proyecto:</strong></label>" +
                 "<textarea type='text' id='descTicket' name='description' class='form-control'> </textarea>" +
+                "</div>" +
+                "<div class='form-group'>" +
+                "<label for='descTicket'><strong>Archivo de detalles:</strong></label>" +
+                "<input type='file' id='fileTicket' name='file' class='form-control' accept='application/pdf'>" +
                 "</div>" +
                 "<div class='d-flex justify-content-center px-3'>" +
                 "<input type='hidden' name='action' value='create_ticket' />" +
@@ -176,6 +180,7 @@
             // Validar campos del formulario de nuevo registro de bitácora para rechazar el proyecto
             let title = document.getElementById("titleTicket").value;
             let description = document.getElementById("descTicket").value;
+            let file = document.getElementById('fileTicket');
 
             // Mostrar mensaje de error si los campos no están completos o no cumplen con las condiciones
             if (description === "" || title === "") {
@@ -184,6 +189,16 @@
             } else if (description.length < 50 || title.length < 10) {
                 showErrorModal("El título debe tener al menos 10 caracteres y la descripción 50.");
                 return false;
+            } else if (file){
+                // Verificar la extensión del archivo
+                var fileName = file.files[0].name;
+                var fileExtension = fileName.split('.').pop().toLowerCase();
+
+                if (fileExtension !== 'pdf'){
+                    showErrorModal("El archivo debe ser de tipo PDF.");
+                    file.value = "";
+                    return false;
+                }
             }
 
             // Si to.do está correcto, retornar true

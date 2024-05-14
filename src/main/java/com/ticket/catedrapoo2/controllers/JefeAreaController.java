@@ -4,13 +4,17 @@ import com.ticket.catedrapoo2.beans.*;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 
 import static com.ticket.catedrapoo2.beans.TicketModel.createTicket;
+import static com.ticket.catedrapoo2.beans.TicketModel.generateNewCode;
 
 @WebServlet(name = "JefeAreaController", urlPatterns = {"/rqc"})
+@MultipartConfig // Config necesaria para recibir los datos de un formulario enctype='multipart/form-data'
 public class JefeAreaController extends HttpServlet {
     JefeAreaBean rqc = new JefeAreaBean();
 
@@ -76,8 +80,34 @@ public class JefeAreaController extends HttpServlet {
             // Se obtienen los datos del formulario
             String ticket_title = request.getParameter("title");
             String ticket_desc = request.getParameter("description");
+            String code = generateNewCode(user_id);
 
-            createTicket(user_id, ticket_title, ticket_desc); // Creación de un nuevo ticket
+            // Manejando el archivo adjunto
+            Part filePart = request.getPart("file"); // Solicitando el archivo a tratar
+            String fileName = "";
+            if (filePart != null && filePart.getSize() > 0) { // Verificando la existencia del archivo
+                fileName = code+".pdf";
+                String storagePath = getServletContext().getRealPath("/storage");
+
+                // Verificar si el directorio "storage" existe
+                File storageDir = new File(storagePath);
+                if (!storageDir.exists()) {
+                    // Si no existe, intenta crearlo
+                    if (!storageDir.mkdir()) {
+                        // Si no se puede crear el directorio, maneja el error
+                        throw new IOException("No se pudo crear el directorio de almacenamiento");
+                    }
+                }
+
+                // Construir la ruta completa para guardar el archivo
+                String pathToSave = storagePath + File.separator + fileName;
+
+                // Escribir el archivo en el disco
+                filePart.write(pathToSave);
+            }
+            System.out.println("Salimos de todo chavales");
+            createTicket(user_id, ticket_title, ticket_desc, code, fileName); // Creación de un nuevo ticket
+            System.out.println("Hay ticket chavales");
 
             response.sendRedirect("/requester/main.jsp?info=success_create_ticket"); // Se redirige a la vista principal con un mensaje de éxito si logra guardar el dato
         } catch (SQLException e) {
