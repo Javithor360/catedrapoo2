@@ -12,7 +12,7 @@
     UserSession user = (UserSession) currentSesion.getAttribute("user");
 
     if (user == null || user.getRole_id() != 0) {
-        response.sendRedirect("/login.jsp");
+        response.sendRedirect("../login.jsp");
         return;
     }
 

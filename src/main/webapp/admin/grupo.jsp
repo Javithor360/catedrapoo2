@@ -15,7 +15,7 @@
     GrupoBean group = (GrupoBean) request.getAttribute("grupo");
 
     if (group == null) {
-        response.sendRedirect("/admin/grupos.jsp");
+        response.sendRedirect("../admin/grupos.jsp");
         return;
     }
 

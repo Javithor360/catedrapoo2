@@ -88,6 +88,7 @@
                     } else {
                         // Iterando el HashMap para mostrar los tickets
                         for(Ticket ticket : new_tickets.values()) {
+                            // Reemplazar los saltos de línea por "\n" para evitar errores en el HTML
                 %>
                     <tr>
                         <td><%= ticket.getCode() %></td>
@@ -109,7 +110,7 @@
                                     id: <%= ticket.getId() %>,
                                     code: '<%= ticket.getCode() %>',
                                     title: '<%= ticket.getName() %>',
-                                    description: '<%= ticket.getDescription() %>',
+                                    description: '<%= ticket.getDescription().replace("\r\n", "\\n") %>',
                                     observations: null,
                                     requester_name: '<%= ticket.getBoss_name() %>',
                                     requester_area_name: '<%= ticket.getRequester_area_name() %>'

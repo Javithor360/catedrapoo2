@@ -17,7 +17,7 @@
     UserSession userSession = (UserSession) currentSesion.getAttribute("user");
 
     if (userSession == null || userSession.getRole_id() != 0) {
-        response.sendRedirect("/login.jsp");
+        response.sendRedirect("../login.jsp");
         return;
     }
 %>
