@@ -15,6 +15,7 @@ public class Users {
     private String gender;
     private Date birthday;
     private String role_id;
+    private int rol;
 
     private Date created_at;
 
@@ -62,18 +63,6 @@ public class Users {
 
     //para guardar valores sin id
     public Users(String name, String email, String password, String gender, Date birthday, String role_id, Date created_at) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.gender = gender;
-        this.birthday = birthday;
-        this.role_id = role_id;
-        this.created_at = created_at;
-    }
-
-    // este se ocupará para listar todo el registro junto al id
-    public Users(int id, String name, String email, String password, String gender, Date birthday, String role_id, Date created_at) {
-        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
@@ -162,6 +151,14 @@ public class Users {
 
     public void setRole_id(String role_id) {
         this.role_id = role_id;
+    }
+
+    public int getRol() {
+        return rol;
+    }
+
+    public void setRol(int rol) {
+        this.rol = rol;
     }
 
 

@@ -5,6 +5,7 @@ import com.ticket.catedrapoo2.beans.GrupoBean;
 import com.ticket.catedrapoo2.beans.UserGroupBean;
 import com.ticket.catedrapoo2.beans.Users;
 import com.ticket.catedrapoo2.models.*;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -14,6 +15,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -120,8 +122,22 @@ public class AdminController extends HttpServlet {
                 Date birthday = null;
 
                 try {
+                    //Dar formato a la fecha para guardar
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     birthday = dateFormat.parse(birthdayString);
+
+                    //Se crea una instancia de Calendar y se establece con la fechaNac que llega
+                    Calendar dob = Calendar.getInstance();
+                    dob.setTime(birthday);
+
+                    //Se establece otro objeto pero con la fecha del momento y se resta 18 años de la fecha actual
+                    // para obtener la fecha que indica que una persona debe tener al menos 18 años.
+                    Calendar today = Calendar.getInstance();
+                    today.add(Calendar.YEAR, -18);
+                    if (dob.after(today)) {
+                        response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp?error=Error:+La+persona+debe+ser+mayor+de+edad");
+                    }
+
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -134,31 +150,42 @@ public class AdminController extends HttpServlet {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 String createdString = dateFormat.format(created);
 
-                Users user = new Users(name, email, password, gender, birthday, rol, created);
                 AdminUsers operaciones = new AdminUsers();
-                boolean resultado = operaciones.agregarUsuario(user);
 
-                if (resultado) {
-                    request.setAttribute("mensaje", "Agregado correctamente");
-                } else {
-                    request.setAttribute("Error", "Error al Crear");
+                boolean res = operaciones.buscarCorreo(email);
+
+
+                if (res){
+                    response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp?error=Error:+el+correo+ya+esta+registrado");
+                }else{
+                    Users user = new Users(name, email, password, gender, birthday, rol, created);
+
+                    boolean resultado = operaciones.agregarUsuario(user);
+
+                    if (resultado) {
+                        response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp?mensaje=Agregado+Correctamente");
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp?error=Error+al+Crear");
+                    }
                 }
 
-                response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
-                break;
+            break;
 
             case "eliminar":
                 int id = Integer.parseInt(request.getParameter("id"));
                 AdminUsers operacionesEliminar = new AdminUsers();
-                boolean resEliminar = operacionesEliminar.eliminarEmpleado(id);
+                boolean resp = operacionesEliminar.buscarUserId(id);
+                if (resp){
+                    response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp?error=Error:+El+empleado+esta+en+un+grupo");
+                }else{
+                    boolean resEliminar = operacionesEliminar.eliminarEmpleado(id);
 
-                if (resEliminar) {
-                    request.setAttribute("mensaje", "Eliminado correctamente");
-                } else {
-                    request.setAttribute("Error!", "Error al eliminar");
+                    if (resEliminar) {
+                        response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp?mensaje=Exito:+Eliminado+correctamente");
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp?error=Error:+Error+al+eliminar");
+                    }
                 }
-
-                response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
                 break;
 
             case "modificarEmpleado":
@@ -185,12 +212,10 @@ public class AdminController extends HttpServlet {
                 boolean resModificar = operacionesModificar.actualizarEmpleado(userModificar);
 
                 if (resModificar) {
-                    request.setAttribute("mensaje", "Modificado correctamente");
+                    response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp?mensaje=Exito:+Modificado+correctamente");
                 } else {
-                    request.setAttribute("Error", "Error al modificar");
+                    response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp?error=Error:+Error+al+modificar");
                 }
-
-                response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp");
                 break;
 
             // Acciones de Areas ==================================================================================

@@ -3,6 +3,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import com.ticket.catedrapoo2.beans.Conexion;
+import com.ticket.catedrapoo2.beans.Roles;
 import com.ticket.catedrapoo2.beans.Users;
 
 public class AdminUsers {
@@ -122,7 +123,7 @@ public class AdminUsers {
                 user.setEmail(rs.getString("email"));
                 user.setGender(rs.getString("gender"));
                 user.setBirthday(rs.getDate("birthday"));
-                user.setRole_id(rs.getString("role_id"));
+                user.setRol(rs.getInt("role_id"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -137,6 +138,121 @@ public class AdminUsers {
         }
 
         return user;
+    }
+
+
+    public List<Roles> listarRoles(){
+        Connection cn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<Roles> rolesList = new ArrayList<>();
+
+        try {
+            cn = new Conexion().getConnection();
+            String tsql = "SELECT * FROM roles";
+            ps = cn.prepareStatement(tsql);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Roles roles = new Roles();
+                roles.setId(rs.getInt("id"));
+                roles.setName(rs.getString("name"));
+                rolesList.add(roles);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (cn != null) cn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return rolesList;
+    }
+
+
+    public boolean buscarUserId(int id){
+        Connection cn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        boolean res = false;
+
+        try {
+            cn = new Conexion().getConnection();
+
+            String sql = "SELECT * FROM users_groups WHERE user_id = ?";
+            ps = cn.prepareStatement(sql);
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                res = true;
+            } else {
+                res = false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (cn != null) {
+                    cn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return res;
+    }
+    public boolean buscarCorreo(String correo) {
+        Connection cn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        boolean res = false;
+
+        try {
+            cn = new Conexion().getConnection();
+
+            String sql = "SELECT * FROM users WHERE email = ?";
+            ps = cn.prepareStatement(sql);
+            ps.setString(1, correo);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                res = true;
+            } else {
+                res = false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (cn != null) {
+                    cn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return res;
     }
 
 

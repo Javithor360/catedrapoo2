@@ -1,21 +1,50 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ page import="com.ticket.catedrapoo2.beans.Users" %>
 <%@ page import="com.ticket.catedrapoo2.models.AdminUsers" %>
+<%@ page import="com.ticket.catedrapoo2.beans.UserSession" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-    <title>Listado de Ventas</title>
+    <title>Listado de Empleados</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
-<body>l
+<body>
+<%
+    // Validar si el usuario tiene permisos para acceder a esta página
+    HttpSession currentSesion = request.getSession(false);
+    UserSession userSession = (UserSession) currentSesion.getAttribute("user");
+
+    if (userSession == null || userSession.getRole_id() != 0) {
+        response.sendRedirect("/login.jsp");
+        return;
+    }
+%>
+
+<jsp:include page="../navbar.jsp"/>
 <div class="container mt-3">
     <center>
         <h1>Listado de Empleados</h1>
     </center>
 </div>
 <div class="container mt-5">
-    <a class="btn btn-info mb-3" href="empleados.jsp">Agregar Empleado</a>
+    <div class="d-flex align-items-start">
+        <a class="btn btn-info mb-3" href="empleados.jsp">Agregar Empleado</a>
+    </div>
+
+    <c:if test="${not empty param.mensaje}">
+        <div class="alert alert-success mt-2">
+            <strong>${param.mensaje}</strong>
+        </div>
+    </c:if>
+
+    <c:if test="${not empty param.error}">
+        <div class="alert alert-danger mt-2">
+            <strong>${param.error}</strong>
+        </div>
+    </c:if>
+
     <table class="table table-bordered">
         <thead class="thead-dark">
         <tr>
@@ -54,17 +83,8 @@
         } %>
         </tbody>
     </table>
-    <c:if test="${not empty requestScope.mensaje}">
-        <div class="alert alert-success mt-5">
-            <strong>Operación: </strong><c:out value="${requestScope.mensaje}"/>
-        </div>
-    </c:if>
 
-    <c:if test="${not empty requestScope.error}">
-        <div class="alert alert-danger mt-5">
-            <strong>Error!: </strong><c:out value="${requestScope.error}"/>
-        </div>
-    </c:if>
+
     <script>
         function alerta(id) {
             var opcion = confirm("¿Está seguro de eliminar este registro?");

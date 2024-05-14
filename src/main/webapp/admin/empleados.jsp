@@ -1,5 +1,8 @@
 <%@ page import="com.ticket.catedrapoo2.models.AdminUsers" %>
 <%@ page import="com.ticket.catedrapoo2.beans.Users" %>
+<%@ page import="com.ticket.catedrapoo2.beans.UserSession" %>
+<%@ page import="com.ticket.catedrapoo2.beans.Roles" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql" %>
@@ -10,6 +13,19 @@
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
+
+<%
+    // Validar si el usuario tiene permisos para acceder a esta página
+    HttpSession currentSesion = request.getSession(false);
+    UserSession userSession = (UserSession) currentSesion.getAttribute("user");
+
+    if (userSession == null || userSession.getRole_id() != 0) {
+        response.sendRedirect("/login.jsp");
+        return;
+    }
+%>
+
+<jsp:include page="../navbar.jsp"/>
 
 <c:choose>
     <c:when test="${not empty param.id}">
@@ -51,32 +67,29 @@
                         <div class="form-group">
                             <label>Género:</label>
                             <select class="form-control" name="gender" required>
-                                <option value="M" ${user.getGender() eq 'M' ? 'selected' : ''}>Masculino</option>
-                                <option value="F" ${user.getGender() eq 'F' ? 'selected' : ''}>Femenino</option>
+                                <option value="M" <%= user.getGender().equals("M") ? "selected" : "" %>>Masculino</option>
+                                <option value="F" <%= user.getGender().equals("F") ? "selected" : "" %>>Femenino</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label>Seleccione el Rol:</label>
                             <select name="rol" class="form-control" required>
-                                <sql:setDataSource driver="com.mysql.cj.jdbc.Driver"
-                                                   url="jdbc:mysql://localhost/catedrapoo"
-                                                   user="root"
-                                                   password=""/>
-                                <sql:query var="q1">
-                                    SELECT * FROM roles
-                                </sql:query>
-                                <c:forEach var="query" items="${q1.rows}">
-                                    <option value="${query.id}" selected>${query.name}</option>
-                                </c:forEach>
+                                <%
+                                    AdminUsers oper = new AdminUsers();
+                                    List<Roles> rolList = oper.listarRoles();
+                                    int roluser = user.getRol();
+                                      for (Roles rol : rolList) {
+                                %>
+                                <option value="<%= rol.getId() %>" <%= rol.getId() == roluser ? "selected" : "" %>><%= rol.getName() %></option>
+                                <% } %>
                             </select>
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <label>Fecha de nacimiento:</label>
-                            <input type="date" class="form-control" value="<%= user.getBirthday() %>" name="birthday"
-                                   required>
+                            <input type="date" class="form-control" value="<%= user.getBirthday() %>" name="birthday" required>
                         </div>
                     </div>
                 </div>
@@ -133,16 +146,13 @@
                         <div class="form-group">
                             <label>Seleccione el Rol:</label>
                             <select name="rol" class="form-control" required>
-                                <sql:setDataSource driver="com.mysql.cj.jdbc.Driver"
-                                                   url="jdbc:mysql://localhost/catedrapoo"
-                                                   user="root"
-                                                   password=""/>
-                                <sql:query var="q1">
-                                    SELECT * FROM roles
-                                </sql:query>
-                                <c:forEach var="query" items="${q1.rows}">
-                                    <option value="${query.id}" selected>${query.name}</option>
-                                </c:forEach>
+                                <%
+                                    AdminUsers operacion = new AdminUsers();
+                                    List<Roles> rolesList = operacion.listarRoles();
+                                    for (Roles rol : rolesList) {
+                                %>
+                                <option value="<%= rol.getId() %>"><%= rol.getName() %></option>
+                                <% } %>
                             </select>
                         </div>
                     </div>
