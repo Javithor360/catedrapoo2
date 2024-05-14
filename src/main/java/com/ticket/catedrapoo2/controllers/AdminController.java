@@ -136,6 +136,7 @@ public class AdminController extends HttpServlet {
                     today.add(Calendar.YEAR, -18);
                     if (dob.after(today)) {
                         response.sendRedirect(request.getContextPath() + "/admin/menuEmpleado.jsp?error=Error:+La+persona+debe+ser+mayor+de+edad");
+                        return;
                     }
 
                 } catch (ParseException e) {
