@@ -40,12 +40,12 @@ public class TicketModel {
         updateStmt.close();
     }
 
-    public static void createTicket(UserSession boss, String name, String description) throws SQLException{
+    public static void createTicket(int boss_id, String name, String description) throws SQLException{
         int devBossId=0;
         Conexion conexion = new Conexion();
 
         try{
-            String query = "SELECT dev_boss_id FROM areas WHERE boss_id = "+boss.getId()+";";
+            String query = "SELECT dev_boss_id FROM areas WHERE boss_id = "+boss_id+";";
 
             conexion.setRs(query);
             ResultSet rs = conexion.getRs();
@@ -57,7 +57,7 @@ public class TicketModel {
             PreparedStatement stmt;
 
             String queryInsert = "INSERT INTO tickets (code, name, description, state_id, boss_id, dev_boss_id, created_at) VALUES " +
-                    "('" + generateNewCode(boss.getId()) + "', '" + name + "', '" + description + "', 1, '" + boss.getId() + "', '" + devBossId + "', CURRENT_TIMESTAMP)";
+                    "('" + generateNewCode(boss_id) + "', '" + name + "', '" + description + "', 1, '" + boss_id + "', '" + devBossId + "', CURRENT_TIMESTAMP)";
 
             stmt = conexion.setQuery(queryInsert);
             stmt.executeUpdate();
