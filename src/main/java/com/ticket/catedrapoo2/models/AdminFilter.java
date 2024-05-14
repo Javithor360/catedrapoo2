@@ -59,7 +59,7 @@ public class AdminFilter {
                         rs.getString("ticket_code"),
                         rs.getString("ticket_name"),
                         rs.getString("ticket_description"),
-                        rs.getString("pdf"),
+                        rs.getString("ticket_pdf"),
                         rs.getString("state"),
                         rs.getInt("state_id"),
                         rs.getString("observations"),
