@@ -16,49 +16,54 @@ public class Area {
 
         try {
             conn = conexion.getConnection();
-            conn.setAutoCommit(false);
+            conn.setAutoCommit(false); // Inicia la transacción
 
             // Insertar en la tabla de areas
-            String query = "INSERT INTO areas (name, prefix_code, boss_id, dev_boss_id) VALUES (?, ?, ?, ?)";
-            stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            String queryArea = "INSERT INTO areas (name, prefix_code, boss_id, dev_boss_id) VALUES (?, ?, ?, ?)";
+            stmt = conn.prepareStatement(queryArea, Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, newArea.getName());
             stmt.setString(2, newArea.getPrefix_code());
             stmt.setInt(3, newArea.getId_boss());
             stmt.setInt(4, newArea.getId_dev_boss());
-            int affectedRows = stmt.executeUpdate();
-
-            if (affectedRows == 0) {
-                throw new SQLException("Creating area failed, no rows affected.");
-            }
+            stmt.executeUpdate();
 
             generatedKeys = stmt.getGeneratedKeys();
+            int newAreaId = 0;
             if (generatedKeys.next()) {
-                int newAreaId = generatedKeys.getInt(1);
-
-                // Insertar en la tabla de Grupos
-                String query1 = "INSERT INTO `groups` (name) VALUES (?), (?)";
-                stmt = conn.prepareStatement(query1);
-                stmt.setString(1, "Empleados " + newArea.getName());
-                stmt.setString(2, "Programadores para " + newArea.getPrefix_code());
-                stmt.executeUpdate();
-
-                // Insertar en la tabla de asignaciones usando el nuevo ID
-                String query2 = "INSERT INTO assignments_map (boss_id, area_id, users_group_id) VALUES (?, ?, ?), (?, ?, ?)";
-                stmt = conn.prepareStatement(query2);
-                stmt.setInt(1, newArea.getId_boss());
-                stmt.setInt(2, newAreaId);
-                stmt.setInt(3, Grupo.countGrupos() + 1);
-                stmt.setInt(4, newArea.getId_dev_boss());
-                stmt.setInt(5, newAreaId);
-                stmt.setInt(6, Grupo.countGrupos() + 2);
-                stmt.executeUpdate();
+                newAreaId = generatedKeys.getInt(1);
             }
 
-            conn.commit();  // Commit the transaction
+            // Insertar en la tabla de Grupos y recuperar ID de grupos
+            String[] groupNames = {"Empleados " + newArea.getName(), "Programadores para " + newArea.getPrefix_code()};
+            int[] groupIDs = new int[2];
+
+            for (int i = 0; i < groupNames.length; i++) {
+                String queryGroup = "INSERT INTO `groups` (name) VALUES (?)";
+                stmt = conn.prepareStatement(queryGroup, Statement.RETURN_GENERATED_KEYS);
+                stmt.setString(1, groupNames[i]);
+                stmt.executeUpdate();
+                generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    groupIDs[i] = generatedKeys.getInt(1);
+                }
+            }
+
+            // Insertar en la tabla de asignaciones usando los nuevos IDs de área y grupo
+            String queryAssign = "INSERT INTO assignments_map (boss_id, area_id, users_group_id) VALUES (?, ?, ?), (?, ?, ?)";
+            stmt = conn.prepareStatement(queryAssign);
+            stmt.setInt(1, newArea.getId_boss());
+            stmt.setInt(2, newAreaId);
+            stmt.setInt(3, groupIDs[0]);  // ID del grupo de empleados
+            stmt.setInt(4, newArea.getId_dev_boss());
+            stmt.setInt(5, newAreaId);
+            stmt.setInt(6, groupIDs[1]);  // ID del grupo de programadores
+            stmt.executeUpdate();
+
+            conn.commit(); // Confirma toda la transacción
         } catch (SQLException e) {
             if (conn != null) {
                 try {
-                    conn.rollback();  // En caso de error, hacer rollback
+                    conn.rollback(); // En caso de error, realiza un rollback
                 } catch (SQLException ex) {
                     e.printStackTrace();
                 }

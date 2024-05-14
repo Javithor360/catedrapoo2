@@ -41,14 +41,18 @@ public class AdminController extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         // Determinar el tipo de contenido de la petición
         String contentType = request.getContentType();
 
         if (contentType != null && contentType.contains("application/json")) {
             handleJsonRequest(request, response);
         } else {
-            handleFormRequest(request, response);
+            try {
+                handleFormRequest(request, response);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -109,10 +113,8 @@ public class AdminController extends HttpServlet {
     }
 
 
-    private void handleFormRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void handleFormRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, SQLException {
         String operacion = request.getParameter("operacion");
-
-        System.out.println("Operación: " + operacion);
 
         switch (operacion) {
             case "nuevoEmpleado":
@@ -222,6 +224,11 @@ public class AdminController extends HttpServlet {
             // Acciones de Areas ==================================================================================
             case "crearAreaFuncional":
                 addArea(request, response);
+                break;
+
+            // Generación de reportes =========================================================================
+            case "generar_reporte":
+                generateInvoice(request, response);
                 break;
 
             default:
@@ -372,6 +379,21 @@ public class AdminController extends HttpServlet {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private void generateInvoice(final HttpServletRequest request, final HttpServletResponse response) throws SQLException, IOException, ServletException {
+        int status = Integer.parseInt(request.getParameter("status"));
+        String start_date = request.getParameter("fecha_inicio");
+        String finish_date = request.getParameter("fecha_fin");
+
+        if(status == 0 || start_date == null || finish_date == null) {
+            response.sendRedirect("/admin/reportes.jsp?info=empty_fields");
+            return;
+        }
+
+        AdminFilter adf = new AdminFilter();
+        request.setAttribute("filtered_tickets", adf.filtered_tickets(status, start_date, finish_date));
+        request.getRequestDispatcher("/admin/reportes.jsp").forward(request, response);
     }
 
 }

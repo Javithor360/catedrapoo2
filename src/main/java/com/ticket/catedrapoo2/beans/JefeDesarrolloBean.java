@@ -164,8 +164,8 @@ public class JefeDesarrolloBean {
                 "INNER JOIN assignments_map a ON t.dev_boss_id = a.boss_id " +
                 "INNER JOIN users_groups ug ON a.users_group_id = ug.group_id " +
                 "INNER JOIN users u ON ug.user_id = u.id " +
-                "WHERE t.dev_boss_id = " + dev_boss_id + " " +
-                    "AND u.role_id = 2 " +
+                "WHERE " +
+                    "u.role_id = 2 " +
                     "AND t.id = " + ticket_id + ";";
         conexion.setRs(query);
 
@@ -176,7 +176,7 @@ public class JefeDesarrolloBean {
             programmers.put(programmer_id, programmer_name);
         }
         conexion.closeConnection();
-
+        System.out.println(ticket_id);
         return programmers;
     }
 

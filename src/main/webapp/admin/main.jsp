@@ -60,6 +60,9 @@
             <li class="list-group-item text-center">
                 <a href="/admin/grupos.jsp">Distribución de Grupos</a>
             </li>
+            <li class="list-group-item text-center">
+                <a href="/admin/reportes.jsp">Generación de Reportes</a>
+            </li>
         </ul>
     </div>
 

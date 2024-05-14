@@ -230,7 +230,7 @@
             <%
                 // Iterar la lista de programadores para mostrarlos en el select
                 try {
-                    for (Map.Entry<Integer, String> programmer : listNames.fetchProgramerListNames(user.getId(), 1).entrySet()) {
+                    for (Map.Entry<Integer, String> programmer : listNames.fetchProgramerListNames(user.getId(), 3).entrySet()) {
             %>
             message += "<option value='<%= programmer.getKey() %>'><%= programmer.getValue() %></option>"; // Definir las opciones del select
             <%
@@ -248,7 +248,7 @@
             <%
                 // Lo mismo para los probadores
                 try {
-                    for (Map.Entry<Integer, String> tester : listNames.fetchTestersListNames(user.getId(), 1).entrySet()) {
+                    for (Map.Entry<Integer, String> tester : listNames.fetchTestersListNames(user.getId(), 3).entrySet()) {
             %>
             message += "<option value='<%= tester.getKey() %>'><%= tester.getValue() %></option>";
             <%
